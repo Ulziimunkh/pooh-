@@ -9,6 +9,7 @@ export default function Home() {
        <p>Welcome to Poohh</p>
        <Facebook></Facebook>
        <Link to="/profile"> Go to profile</Link>
+       <Link to="/chat"> Чатлах</Link>
       </header>
     </div>
     </>
