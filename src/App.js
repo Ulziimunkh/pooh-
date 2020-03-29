@@ -1,14 +1,19 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import { Route, Switch } from "react-router-dom";
+import Profile from "./pages/Profile";
+import Home from "./pages/Home";
+import Error from "./pages/Error";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-       <p>Welcome to Poohh</p>
-      </header>
-    </div>
+    <>
+    <Switch>
+    <Route path="/" exact component = {Home}></Route>
+    <Route path="/profile" exact  component = {Profile}></Route>
+    <Route component={Error}></Route>
+    </Switch>
+    </>
   );
 }
 
