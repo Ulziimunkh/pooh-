@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
-
+import firebase from 'firebase'
 export default class Profile  extends Component {
    // const {name, email, picture} = fb;
    render(){
@@ -9,24 +9,26 @@ export default class Profile  extends Component {
             <>
             <div className="App">
               <header className="App-header">
-                <h2>Welcome {this.props.location.state.name}</h2>
-                <div
-                style={{
-                    width: "400px",
-                    margin: "auto",
-                    background: "#000",
-                    padding: "20px"
-                }}
-                >
-                <img src={this.props.location.state.picture} alt={this.props.location.state.name} />
-                <h2>Welcome {this.props.location.state.name}</h2>
-                Email: {this.props.location.state.email}
+              <div>
+                    <h1>Pooh!</h1>
+                    <img alt={firebase.auth().currentUser.displayName} src={firebase.auth().currentUser.photoURL} />
+                    <p>
+                    Welcome {firebase.auth().currentUser.displayName}! You are now
+                    signed-in!
+                    </p>
+                    <button onClick={(e) => this.logout(e)}>Sign-out</button>
                 </div>
-                <Link to="/"> Go to Home</Link>
+                <Link to="/dashboard"> Go to Home</Link>
               </header>
             </div>
             </>
         )
+            };
+            
+            logout = (e) => {
+                e.preventDefault();
+                firebase.auth().signOut();
+                this.props.history.push('/');
             }
 }
 
