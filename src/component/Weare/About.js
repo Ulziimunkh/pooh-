@@ -1,6 +1,5 @@
 import React from 'react';
-import NavBar from '../NavBar/NavBar'
-import 
+import NavBar from '../NavBar/NavBar';
  export default class Aboutus extends React.Component {
   render() {
     return (
