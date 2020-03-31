@@ -13,6 +13,9 @@ import * as serviceWorker from './serviceWorker';
 import Dashboard from './component/Dashboard/Dashboard';
 import i18n from './localization/i18n'
 import { I18nextProvider } from "react-i18next";
+import   Aboutus from './component/Weare/About';
+import   Privacy from './component/Weare/Privacy';
+import  Term from './component/Weare/Term';
 
 // routing
 const routing = (
@@ -26,7 +29,11 @@ const routing = (
         <Route path="/login" exact component = {Login}></Route>
         <Route path="/profile" exact  component = {Profile}></Route>
         <Route path="/dashboard" exact  component = {Dashboard}></Route>
+        <Route path="/aboutus" exact  component = {Aboutus}></Route>
+        <Route path="/term" exact  component = {Term}></Route>
+        <Route path="/privacy" exact  component = {Privacy}></Route>
         <Route component={Error}></Route>
+
       </Switch>
     </div>
   </Router>

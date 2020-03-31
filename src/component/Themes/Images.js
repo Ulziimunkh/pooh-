@@ -1,3 +1,5 @@
+import { I18nContext } from 'react-i18next'
+
 const images = {
     ic_logout: require('../../images/ic_logout.png'),
     ic_default_avatar: require('../../images/ic_default_avatar.png'),
@@ -6,6 +8,11 @@ const images = {
     ic_sticker: require('../../images/ic_sticker.png'),
     ic_send: require('../../images/ic_send.png'),
     ic_wave_hand: require('../../images/ic_wave_hand.png'),
+    logo: require('../../images/mangologo1.png'),
+    ic_search: require('../../images/search-icon.png'),
+
+
+
 
     mimi1: require('../../images/mimi1.gif'),
     mimi2: require('../../images/mimi2.gif'),

@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import { Redirect } from "react-router-dom";
+import { Redirect, Link } from "react-router-dom";
 // import mango from '../../images/mango.png'
 import {myFirestore,  myFirebase} from '../../Config/MyFirebase'
 // import { useTranslation } from 'react-i18next';
 // import i18n from '../../localization/i18n'
 // import { I18nextProvider } from "react-i18next";
 
-
+import NavBar from "../NavBar/NavBar";
 export default class AuthProvider extends Component {
     //localization
     // The component's Local state.
@@ -147,6 +147,9 @@ export default class AuthProvider extends Component {
       if (!this.state.isSignedIn) {
         document.getElementsByTagName("BODY")[0].classList.add("login-page");
         return (
+          <>
+         <NavBar></NavBar>
+        <div className="App-header">
         <div className="login-content" >
           <h1>Welcome to Mango!</h1>
           <p>Please sign-in:</p>
@@ -155,6 +158,9 @@ export default class AuthProvider extends Component {
             firebaseAuth={myFirebase.auth()}
           />
         </div>
+        
+        </div>
+        </>
       );
     }
     document.getElementsByTagName("BODY")[0].classList.remove("login-page");
