@@ -26,7 +26,7 @@ class ChatListComponent extends React.Component {
               color='primary' 
               onClick={this.newChat} 
               className={classes.newChatBtn}>
-                New Message
+                Start New Chat
             </Button>
             <List>
               {
@@ -38,10 +38,10 @@ class ChatListComponent extends React.Component {
                         selected={this.props.selectedChatIndex === _index} 
                         alignItems="flex-start">
                         <ListItemAvatar>
-                          <Avatar alt="Remy Sharp" className={classes.orange}>{_chat.users.filter(_user => _user !== this.props.userEmail)[0].split('')[0]}</Avatar>
+                          <Avatar alt="User Name" className={classes.orange}>{(_chat.hostId === this.props.userId ? _chat.clientAlias : _chat.hostAlias).split('')[0] }</Avatar>
                         </ListItemAvatar>
                         <ListItemText 
-                          primary={_chat.users.filter(_user => _user !== this.props.userEmail)[0]}
+                          primary={_chat.hostId === this.props.userId ? _chat.clientAlias : _chat.hostAlias }
                           secondary={
                             <React.Fragment>
                               <Typography component='span'
@@ -72,14 +72,14 @@ class ChatListComponent extends React.Component {
             color='primary' 
             onClick={this.newChat} 
             className={classes.newChatBtn}>
-              New Message
+              Start New Chat
           </Button>
           <List></List>
         </div>
       );
     }
   }
-  userIsSender = (chat) => chat.messages[chat.messages.length - 1].sender === this.props.userEmail;
+  userIsSender = (chat) => chat.messages[chat.messages.length - 1].sender === this.props.userId;
   newChat = () => this.props.newChatBtnFn();
   selectChat = (index) => this.props.selectChatFn(index);
 }

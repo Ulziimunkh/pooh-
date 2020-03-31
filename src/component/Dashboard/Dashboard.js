@@ -23,7 +23,7 @@ class DashboardComponent extends React.Component {
     this.state = {
       selectedChat: null,
       newChatFormVisible: false,
-      email: null,
+      userId: null,
       friends: [],
       chats: []
     };
@@ -33,11 +33,11 @@ class DashboardComponent extends React.Component {
 
     const { classes } = this.props;
 
-    if(this.state.email) {
+    if(this.state.userId) {
       return(
         <div className='dashboard-container' id='dashboard-container'>
           <ChatListComponent history={this.props.history} 
-            userEmail={this.state.email} 
+            userId={this.state.userId} 
             selectChatFn={this.selectChat} 
             chats={this.state.chats} 
             selectedChatIndex={this.state.selectedChat}
@@ -45,7 +45,7 @@ class DashboardComponent extends React.Component {
           </ChatListComponent>
           {
             this.state.newChatFormVisible ? null : <ChatViewComponent 
-              user={this.state.email} 
+              userId={this.state.userId} 
               chat={this.state.chats[this.state.selectedChat]}>
             </ChatViewComponent>
           }
@@ -73,7 +73,7 @@ class DashboardComponent extends React.Component {
       .doc(docKey)
       .update({
         messages: myFirebase.firestore.FieldValue.arrayUnion({
-          sender: this.state.email,
+          sender: this.state.userId,
           message: msg,
           timestamp: Date.now()
         }),
@@ -81,28 +81,68 @@ class DashboardComponent extends React.Component {
       });
   }
 
-  newChatBtnClicked = () => this.setState({ newChatFormVisible: true, selectedChat: null });
+  newChatBtnClicked = () => this.newChatSubmit();
 
   newChatSubmit = async (chatObj) => {
-    await 
-      myFirestore
-        .collection('chats')
-        .doc()
-        .set({
-          messages: [{
-            message: chatObj.message,
-            sender: this.state.email
-          }],
-          users: [this.state.email, chatObj.sendTo],
-          receiverHasRead: false
-        })
+    console.log('email', this.state.userId);
+    if(this.state.chats.length < 3){
+      await myFirestore
+      .collection('users')
+      //.where('email', '>=', this.state.email)
+      .onSnapshot(async res => {
+        const friends = res.docs.filter(doc => doc.data().userId !== this.state.userId).map(_doc => _doc.data());
+        await this.setState({
+          userId: this.state.userId,
+          friends: friends
+        });
+        if(this.state.friends.length > 0){
+          console.log('friends', this.state.friends)
+          var winner = this.state.friends[this.random(0, this.state.friends.length)];
+          if(winner.userId && this.state.userId !== winner.userId){
+            let tempId = Date.now();
+            let tempUserId = String(tempId).substr(-8)
+            await 
+          myFirestore
+          .collection('chats')
+          .doc()
+          .set({
+            chatName: 'Room-' + tempId,
+            messages: [{
+              message: 'Welcome to Mango chat!. Your chat has started. Enjoy!',
+              sender: this.state.userId,
+              timestamp: tempId
+            }],
+            hostId: this.state.userId,
+            hostAlias: "Host-" + tempUserId,
+            clientId: winner.userId,
+            clientAlias: "Client-" + tempUserId,
+            users: [this.state.userId, winner.userId],
+            receiverHasRead: false,
+            isActive: true,
+            createdDate: new Date()
+          }).then(async r => {
+            await this.selectChat(this.state.chats.length - 1);
+          }).catch((e) =>{
+            console.log('error add chat', e);
+          })
+          }
+          else {
+            alert('Sorry! We are not able to create chat. duplicate_user');
+          }
+        }
+      })
+    }else {
+      alert('Sorry, Your chat limit has reached.')
+    }
     this.setState({ newChatFormVisible: false });
-    this.selectChat(this.state.chats.length - 1);
   }
 
   selectChat = async (chatIndex) => {
-    await this.setState({ selectedChat: chatIndex, newChatFormVisible: false });
-    this.messageRead();
+    console.log('chatIndex:', chatIndex)
+    if(this.state.chats.length > 0 && chatIndex >= 0) {
+      await this.setState({ selectedChat: chatIndex, newChatFormVisible: false });
+      this.messageRead();
+    }
   }
 
   goToChat = async (docKey, msg) => {
@@ -128,7 +168,7 @@ class DashboardComponent extends React.Component {
     }
   }
 
-  clickedMessageWhereNotSender = (chatIndex) => this.state.chats[chatIndex].messages[this.state.chats[chatIndex].messages.length - 1].sender !== this.state.email;
+  clickedMessageWhereNotSender = (chatIndex) => this.state.chats[chatIndex].messages[this.state.chats[chatIndex].messages.length - 1].sender !== this.state.userId;
 
   componentWillMount = () => {
       myFirebase.auth().onAuthStateChanged(async _usr => {
@@ -137,12 +177,13 @@ class DashboardComponent extends React.Component {
         else {
           await myFirestore
             .collection('chats')
-            .where('users', 'array-contains', _usr.email)
+            .where('isActive', '==', true)
+            .where('users', 'array-contains', _usr.uid)
             .onSnapshot(async res => {
-              const chats = res.docs.map(_doc => ({..._doc.data(), chatId: _doc.id}));
-              console.log('cahts', chats)
+              const chats = res.docs.map(_doc => ({..._doc.data(), chatId: _doc.id})).sort((a, b) => new Date(b.createdDate)- new Date(a.createdDate));
+              console.log('chats', chats)
               await this.setState({
-                email: _usr.email,
+                userId: _usr.uid,
                 chats: chats,
                 friends: []
               });
@@ -150,6 +191,9 @@ class DashboardComponent extends React.Component {
         }
     });
   }
+  random = (mn, mx) => {
+    var num = Math.round(Math.random() * (mx - mn) + mn) -1;  
+   return  num < 0 ? 0 : num;  
+ } 
 }
-
 export default withStyles(styles)(DashboardComponent);

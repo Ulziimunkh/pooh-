@@ -8,6 +8,7 @@ import {myFirestore,  myFirebase} from '../../Config/MyFirebase'
 // import { I18nextProvider } from "react-i18next";
 
 import NavBar from "../NavBar/NavBar";
+import { now } from "moment";
 export default class AuthProvider extends Component {
     //localization
     // The component's Local state.
@@ -49,19 +50,23 @@ export default class AuthProvider extends Component {
       signInSuccessWithAuthResult: (authResult, redirectUrl) => {
         console.log("login result:", authResult);
         if (authResult.credential) {
+          const dt = new Date()
           const { user, additionalUserInfo, credential } = authResult;
           const userObj = {
-              uid: user.uid,
-              displayName: user.displayName,
-              email: user.email,
-              photoURL: user.photoURL,
-              emailVerified: false,
-              lastSignedDate: new Date()
-            };
+            userId: user.uid,
+            displayName: user.displayName,
+            email: user.email,
+            photoURL: user.photoURL,
+            emailVerified: false,
+            aboutMe: 'Let\'s have fun.',
+            createdDate: dt,
+            lastSignedDate: dt
+          };
           switch (authResult.additionalUserInfo.providerId) {
             case "facebook.com":
               if (additionalUserInfo.isNewUser) {
-                  
+                  userObj.gender = additionalUserInfo.profile.gender;
+                  userObj.birthday = additionalUserInfo.profile.birthday;
               } else {
               }
               break;
@@ -84,9 +89,7 @@ export default class AuthProvider extends Component {
             .doc(userObj.email)
             .set(userObj)
             .then(() => {
-                return(
-                    <Redirect to="/"/>
-                );
+              console.log('registered successfully...');
           }, dbErr => {
             console.log('Failed to add user to the database: ', dbErr);
             this.setState({ signupError: 'Failed to add user' });
@@ -106,7 +109,9 @@ export default class AuthProvider extends Component {
                   });
               //update
           }
-          
+          myFirebase.auth().onAuthStateChanged(_usr => {
+            _usr.userId = userObj.userId
+          })
           console.log("loggod from: ", credential.providerId);
           console.log("user data: ", user);
           console.log("Additional user data: ", additionalUserInfo.isNewUser);

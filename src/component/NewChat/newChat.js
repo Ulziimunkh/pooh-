@@ -87,8 +87,6 @@ class NewChatComponent extends React.Component {
     }
   }
 
-  buildDocKey = () => [myFirebase.auth().currentUser.email, this.state.username].sort().join(':');
-
   createChat = () => {
     this.props.newChatSubmitFn({
       sendTo: this.state.username,

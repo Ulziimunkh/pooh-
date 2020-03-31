@@ -24,13 +24,13 @@ class ChatViewComponent extends React.Component {
       return(
         <div>
           <div className={classes.chatHeader}>
-            Your conversation with {this.props.chat.users.filter(_usr => _usr !== this.props.user)[0]}
+            Your conversation with {this.props.chat.hostId === this.props.userId ? this.props.chat.clientAlias : this.props.chat.hostAlias }
           </div>
           <main id='chatview-container' className={classes.content}>
             {
               this.props.chat.messages.map((_msg, _index) => {
                 return(
-                <div key={_index} className={_msg.sender === this.props.user ? classes.friendSent : classes.userSent}>
+                <div key={_index} className={_msg.sender === this.props.userId ? classes.friendSent : classes.userSent}>
                   {_msg.message}
                 </div>
                 )
