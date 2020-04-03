@@ -7,7 +7,7 @@ const images = {
     ic_send: require('../../images/ic_send.png'),
     ic_wave_hand: require('../../images/ic_wave_hand.png'),
     logo: require('../../images/mangologo1.png'),
-    ic_search: require('../../images/search-icon.png'),
+    ic_menu: require('../../images/search-icon2.png'),
 
 
 

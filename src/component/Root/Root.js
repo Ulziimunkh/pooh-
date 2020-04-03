@@ -10,6 +10,7 @@ import Aboutus from "../Weare/About";
 import Privacy from "../Weare/Privacy";
 import Term from "../Weare/Term";
 import Loader from "../Loader/Loader"
+import Test from "../Test/Test";
 class Root extends Component {
   constructor(props) {
     super(props);
@@ -50,6 +51,7 @@ setLoading = (value) => {
             <Route path="/aboutus" exact render={props => <Aboutus showToast={this.showToast} {...props}/>} />
             <Route path="/term" exact render={props => <Term showToast={this.showToast} {...props}/>} />
             <Route path="/privacy" exact render={props => <Privacy showToast={this.showToast} {...props}/>} />
+            <Route path="/test" exact render={props => <Test showToast={this.showToast} {...props}/>} />
             <Route component={Error}></Route>
           </Switch>
         </div>

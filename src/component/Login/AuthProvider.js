@@ -4,7 +4,8 @@ import { Redirect} from "react-router-dom";
 import { myFirestore, myFirebase } from "../../Config/MyFirebase";
 import {AppString} from '../../Config/AppString'
 import NavBar from "../NavBar/NavBar";
-export default class AuthProvider extends Component {
+export default class AuthProvider extends Component
+{
   //localization
   // The component's Local state.
   state = {
