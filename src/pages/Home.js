@@ -15,11 +15,9 @@ export default class Home extends Component {
   checkLogin = () => {
     if (localStorage.getItem(AppString.ID)) {
       this.props.setLoading(false);
-      this.setState(() => {
-        this.setState({ isLoading: false });
-        this.props.showToast(1, "Login success");
-        this.props.history.push("/main");
-      });
+      //this.props.showToast(1, "Login success");
+      document.getElementsByTagName("BODY")[0].classList.remove("home-page");
+      this.props.history.push("/dashboard");
     } else {
       this.props.setLoading(false);
     }
