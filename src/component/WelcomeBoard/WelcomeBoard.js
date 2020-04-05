@@ -8,12 +8,12 @@ export default class WelcomeBoard extends Component {
         super(props)
         this.currentUserId = localStorage.getItem(AppString.ID)
         this.currentUserAvatar = localStorage.getItem(AppString.PHOTO_URL)
-        this.currentUserNickname = localStorage.getItem(AppString.NICKNAME)
+        this.currentUserDisplayName = localStorage.getItem(AppString.DISPLAYNAME)
     }
   render() {
     return (
       <div className="viewWelcomeBoard">
-        <span className="textTitleWelcome">{`Welcome, ${this.currentUserNickname}`}</span>
+        <span className="textTitleWelcome">{`Welcome, ${this.currentUserDisplayName}`}</span>
         <img
           className="avatarWelcome"
           src={this.currentUserAvatar}

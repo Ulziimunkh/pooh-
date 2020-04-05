@@ -1,34 +1,18 @@
 import React, { Component } from "react";
-import AuthProvider from "../component/Login/AuthProvider";
+import Login from "../component/Login/Login";
 import "../App.css";
-import {AppString} from '../Config/AppString';
+import NavBar from "../component/NavBar/NavBar";
 export default class Home extends Component {
-  constructor(props) {
-    super(props);
-    this.props.setLoading(true);
-  }
-
-  componentDidMount() {
-    this.checkLogin();
-  }
-
-  checkLogin = () => {
-    if (localStorage.getItem(AppString.ID)) {
-      this.props.setLoading(false);
-      //this.props.showToast(1, "Login success");
-      document.getElementsByTagName("BODY")[0].classList.remove("home-page");
-      this.props.history.push("/dashboard");
-    } else {
-      this.props.setLoading(false);
-    }
-  };
   render() {
     return (
       <>
-        <AuthProvider
-          setLoading={this.props.setLoading}
-          showToast={this.props.showToast}
-        />
+        <div className="home-page">
+          <NavBar></NavBar>
+          <Login
+            setLoading={this.props.setLoading}
+            showToast={this.props.showToast}
+          />
+        </div>
       </>
     );
   }

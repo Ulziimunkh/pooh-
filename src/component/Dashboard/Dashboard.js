@@ -6,6 +6,7 @@ import ChatTextBoxComponent from "../ChatTextBox/chatTextBox";
 import styles from "./styles";
 import { Button, withStyles } from "@material-ui/core";
 import 'react-toastify/dist/ReactToastify.css'
+import {AppString} from '../../Config/AppString'
 import { myFirestore, myFirebase } from "../../Config/MyFirebase";
 import Header from "../DashHeader/Header";
 
@@ -194,10 +195,31 @@ class DashboardComponent extends React.Component {
       this.state.chats[chatIndex].messages.length - 1
     ].sender !== this.state.userId;
 
+  downloadUserData = async (uid) => {
+    const result = await myFirestore
+    .collection("users")
+    .where(AppString.ID, '==', uid).get();
+    if(result.docs.length > 0) {
+      // Write user info to local
+      const userExist = result.docs[0].data();
+      localStorage.setItem(AppString.ID, uid)
+      localStorage.setItem( AppString.DISPLAYNAME, userExist.displayName)
+      localStorage.setItem(AppString.PHOTO_URL, userExist.photoURL)
+      localStorage.setItem(AppString.ABOUT_ME, userExist.aboutMe)
+    }
+  }
   componentWillMount = () => {
+    document.getElementsByTagName("BODY")[0].classList.remove("home-page");
+    this.props.setLoading(true);
     myFirebase.auth().onAuthStateChanged(async _usr => {
       if (!_usr) this.props.history.push("/");
       else {
+        // GET Profile data
+        if (!localStorage.getItem(AppString.ID)) {
+          this.downloadUserData(_usr.uid);
+          //this.props.showToast(1, 'Login success')
+        }
+        // Get Chat List ########################### 
         await myFirestore
           .collection("chats")
           .where("isActive", "==", true)

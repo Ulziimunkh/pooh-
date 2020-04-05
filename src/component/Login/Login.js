@@ -1,22 +1,22 @@
 import React, { Component } from "react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import { Redirect} from "react-router-dom";
+import {withRouter, Redirect} from 'react-router-dom'
 import { myFirestore, myFirebase } from "../../Config/MyFirebase";
-import {AppString} from '../../Config/AppString'
-import NavBar from "../NavBar/NavBar";
-export default class AuthProvider extends Component
+class Login extends Component
 {
-  //localization
-  // The component's Local state.
-  state = {
-    isSignedIn: false, // Local signed-in state.
-    signupError: "",
-    isLoading: false
-  };
+  constructor(props) {
+    super(props)
+    // The component's Local state.
+    this.state = {
+      isSignedIn: false, // Local signed-in state.
+      signupError: ""
+    };
+}
+  
 
   uiConfig = {
     signInFlow: "popup",
-    signInSuccessUrl: "/dashboard",
+    signInSuccessUrl: "",
     signInOptions: [
       {
         provider: myFirebase.auth.FacebookAuthProvider.PROVIDER_ID,
@@ -47,14 +47,15 @@ export default class AuthProvider extends Component
         console.log("login result:", authResult);
         if (authResult.credential) {
           const dt = new Date();
-          const { user, additionalUserInfo, credential } = authResult;
+          const { user, additionalUserInfo } = authResult;
           const userObj = {
-            userId: user.uid,
+            id: user.uid,
             displayName: user.displayName,
             email: user.email,
             photoURL: user.photoURL,
             emailVerified: false,
             aboutMe: "Let's have fun.",
+            providerId: authResult.additionalUserInfo.providerId,
             createdDate: dt,
             lastSignedDate: dt
           };
@@ -82,26 +83,24 @@ export default class AuthProvider extends Component
           if (additionalUserInfo.isNewUser) {
             myFirestore
               .collection("users")
-              .doc(userObj.email)
+              .doc(user.uid)
               .set(userObj)
               .then(
                 () => {
                   console.log("registered successfully...");
-                  this.setDataToLocalStorage(user);
                 },
                 dbErr => {
-                  console.log("Failed to add user to the database: ", dbErr);
                   this.setState({ signupError: "Failed to add user" });
                 }
               );
           } else {
             myFirestore
               .collection("users")
-              .doc(user.email)
+              .doc(user.uid)
               .update({ lastSignedDate: new Date() })
               .then(
                 (userUpdated) => {
-                  this.setDataToLocalStorage(user);
+                 
                 },
                 dbErr => {
                   console.log(
@@ -113,9 +112,6 @@ export default class AuthProvider extends Component
               );
             //update
           }
-          console.log("loggod from: ", credential.providerId);
-          console.log("user data: ", user);
-          console.log("Additional user data: ", additionalUserInfo.isNewUser);
         }
         return false;
       },
@@ -149,37 +145,25 @@ export default class AuthProvider extends Component
   componentWillUnmount() {
     this.unregisterAuthObserver();
   }
-  setDataToLocalStorage = (user) => {
-    // Write user info to local
-    localStorage.setItem(AppString.ID, user.uid)
-    localStorage.setItem(AppString.NICKNAME, user.displayName)
-    localStorage.setItem(AppString.PHOTO_URL, user.photoURL)
-    this.props.setLoading(false);
-    this.setState(() => {
-        this.props.showToast(1, 'Login success')
-        this.props.history.push('/dashboard')
-    })
-  }
+
   render() {
     if (!this.state.isSignedIn) {
-      document.getElementsByTagName("BODY")[0].classList.add("home-page");
-      return (
-        <>
-          <NavBar></NavBar>
-          <div className="home-login">
-            <div className="login-content">
-              <h1>Welcome to Mango!</h1>
-              <p>Please sign-in:</p>
-              <StyledFirebaseAuth 
-                uiConfig={this.uiConfig}
-                firebaseAuth={myFirebase.auth()}
-              />
-            </div>
+    return (
+      <>
+        <div className="home-login">
+          <div className="login-content">
+            <h1>Welcome to Mango!</h1>
+            <p>Please sign-in:</p>
+            <StyledFirebaseAuth 
+              uiConfig={this.uiConfig}
+              firebaseAuth={myFirebase.auth()}
+            />
           </div>
-        </>
-      );
+        </div>
+      </>
+    );
     }
-    document.getElementsByTagName("BODY")[0].classList.remove("home-page");
     return <Redirect to={{ pathname: "/dashboard" }}></Redirect>;
   }
 }
+export default withRouter(Login)

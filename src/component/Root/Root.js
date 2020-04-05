@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import "./Root.css";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import Profile from "../../pages/Profile";
+import Profile from "../../pages/Profile/Profile";
 import Home from "../../pages/Home";
 import Error from "../../pages/Error";
 import Dashboard from "../Dashboard/Dashboard";
