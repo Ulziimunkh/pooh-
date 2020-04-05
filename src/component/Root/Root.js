@@ -11,6 +11,7 @@ import Privacy from "../Weare/Privacy";
 import Term from "../Weare/Term";
 import Loader from "../Loader/Loader"
 import Test from "../Test/Test";
+import Footer from "../../pages/Footer/Footer"
 class Root extends Component {
   constructor(props) {
     super(props);
@@ -53,6 +54,7 @@ setLoading = (value) => {
             <Route path="/privacy" exact render={props => <Privacy showToast={this.showToast} {...props}/>} />
             <Route path="/test" exact render={props => <Test showToast={this.showToast} {...props}/>} />
             <Route component={Error}></Route>
+            {/* <Route component={Footer}></Route> */}
           </Switch>
         </div>
       </Router>

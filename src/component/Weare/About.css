@@ -30,18 +30,15 @@
     margin-right: 150px;
     margin-left: 300px;
     color: #c4c0c0;
+    
+    font-family: "proxima-nova", "Helvetica Neue", helvetica, sans-serif;
+    font-weight: 100;
+    color: #c4c0c0;
+    font-size: 20px;
+    background-color: white;
+    line-height: 1.3em;
   
     }
    
-    .text 
-    {
-           font-family: "proxima-nova", "Helvetica Neue", helvetica, sans-serif;
-           font-weight: 100;
-           color: #c4c0c0;
-           font-size: 20px;
-           background-color: white;
-           line-height: 1.3em;
-       
-   }
-
+   
  

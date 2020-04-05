@@ -15,6 +15,7 @@ import './About.css'
 
 We appreciate that you put your trust in us when you provide us with your information and we do not take this lightly.</h3>
       </div>
+      {/* <Footer></Footer> */}
     </>)
     
   }

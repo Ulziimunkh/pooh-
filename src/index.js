@@ -3,7 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import * as serviceWorker from './serviceWorker';
 import Root from './component/Root/Root';
+import Footer from './pages/Footer/Footer'
 
+ReactDOM.render(<Footer/>, document.getElementById("footer"));
 ReactDOM.render(<Root/>, document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
