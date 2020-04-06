@@ -1,20 +1,5 @@
-/*.pagecontent{
-    margin:0;
-    padding:0;
-    font-family:"Open Sans",sans-serif
-}
-*/
-.footer-container { 
-    width: 100%;
+.footer-container {
+    text-align: center;
     height: 30px;
-    margin: auto;
-    padding: 0 20px;
-    position: absolute;
-    display: flex;
-    justify-content:center;
-    align-items:center;
-    background-color: #ccc;
-    flex-wrap:wrap-reverse;
-    bottom: 0;
 }
 

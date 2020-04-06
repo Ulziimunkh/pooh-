@@ -1,18 +1,12 @@
-import React from 'react'
+import React from "react";
+import "./Footer.css";
 
-import FacebookIcon from '@material-ui/icons/Facebook';
-import './Footer.css';
-export default class Footer extends React.Component{ 
-render() {
+export default class Footer extends React.Component {
+  render() {
     return (
-        /* */
-        
-        <div className="footer-container">
-        <div class="right_text">©2020 Created by Mangochat All Rights Reserved</div>
-        </div>
-
-                 
-        
-        )
-    }
+      <div className="footer-container">
+        <p> ©2020 Created by Mangochat All Rights Reserved </p>
+      </div>
+    );
+  }
 }

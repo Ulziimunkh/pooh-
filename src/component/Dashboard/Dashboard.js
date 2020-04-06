@@ -22,6 +22,8 @@ class DashboardComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      currentUser: null, // logged user
+      currentPeerUser: null, // current selected chat User
       selectedChat: null,
       newChatFormVisible: false,
       userId: null,
@@ -103,7 +105,7 @@ class DashboardComponent extends React.Component {
         //.where('email', '>=', this.state.email)
         .onSnapshot(async res => {
           const friends = res.docs
-            .filter(doc => doc.data().userId !== this.state.userId)
+           .filter(doc => doc.data().id !== this.state.userId)
             .map(_doc => _doc.data());
           await this.setState({
             userId: this.state.userId,
@@ -114,7 +116,7 @@ class DashboardComponent extends React.Component {
             var winner = this.state.friends[
               this.random(0, this.state.friends.length)
             ];
-            if (winner.userId && this.state.userId !== winner.userId) {
+            if (winner.id && this.state.userId !== winner.id) {
               let tempId = Date.now();
               let tempUserId = String(tempId).substr(-8);
               await myFirestore
@@ -132,9 +134,9 @@ class DashboardComponent extends React.Component {
                   ],
                   hostId: this.state.userId,
                   hostAlias: "Host-" + tempUserId,
-                  clientId: winner.userId,
+                  clientId: winner.id,
                   clientAlias: "Client-" + tempUserId,
-                  users: [this.state.userId, winner.userId],
+                  users: [this.state.userId, winner.id],
                   receiverHasRead: false,
                   isActive: true,
                   createdDate: new Date()
@@ -202,6 +204,7 @@ class DashboardComponent extends React.Component {
     if(result.docs.length > 0) {
       // Write user info to local
       const userExist = result.docs[0].data();
+      this.setState({currentUser: userExist});
       localStorage.setItem(AppString.ID, uid)
       localStorage.setItem( AppString.DISPLAYNAME, userExist.displayName)
       localStorage.setItem(AppString.PHOTO_URL, userExist.photoURL)

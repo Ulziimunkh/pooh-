@@ -4,8 +4,17 @@ import { myStorage, myFirestore } from "../../Config/MyFirebase";
 import { AppString } from "../../Config/AppString";
 import "./Profile.css";
 import images from "../../component/Themes/Images";
+import {
+  FormControlLabel,
+  FormGroup,
+  FormControl,
+  InputLabel,
+  FormHelperText,
+  Input,
+  Switch,
+} from "@material-ui/core";
 import { Button } from "@material-ui/core";
-
+const interestedInList = ["both", "male", "female"];
 export default class Profile extends Component {
   // const {name, email, picture} = fb;
   constructor(props) {
@@ -15,7 +24,10 @@ export default class Profile extends Component {
       id: localStorage.getItem(AppString.ID),
       displayName: localStorage.getItem(AppString.DISPLAYNAME),
       aboutMe: localStorage.getItem(AppString.ABOUT_ME),
-      photoUrl: localStorage.getItem(AppString.PHOTO_URL)
+      photoUrl: localStorage.getItem(AppString.PHOTO_URL),
+      interestedIn: "both",
+      showDisplayName: false,
+      showProPhoto: false,
     };
     this.newAvatar = null;
     this.newPhotoUrl = "";
@@ -34,7 +46,15 @@ export default class Profile extends Component {
   };
   onChangeEvent = (event) => {
     const name = event.target.name;
-    const value = event.target.value;
+    console.log(
+      "Profile -> onChangeEvent -> event.target.type",
+      event.target.type
+    );
+    console.log("Profile -> onChangeEvent -> name", name);
+    const value =
+      event.target.type === "checkbox"
+        ? event.target.checked
+        : event.target.value;
     this.setState({ [name]: value });
   };
   onChangeAvatar = (event) => {
@@ -76,19 +96,18 @@ export default class Profile extends Component {
     }
   };
   updateUserInfo = (isUpdatePhotoUrl, downloadURL) => {
-    let newInfo;
+    let newInfo = {
+      displayName: this.state.displayName,
+      aboutMe: this.state.aboutMe,
+    };
+    let userConfig = {
+      interestedIn: this.state.interestedIn,
+      showProPhoto: this.state.showProPhoto,
+    };
     if (isUpdatePhotoUrl) {
-      newInfo = {
-        displayName: this.state.displayName,
-        aboutMe: this.state.aboutMe,
-        photoURL: downloadURL,
-      };
-    } else {
-      newInfo = {
-        displayName: this.state.displayName,
-        aboutMe: this.state.aboutMe,
-      };
+      newInfo.photoURL = downloadURL;
     }
+    // myFirestore.collection("userConfig").doc(this.state.id).update(newInfo);
     myFirestore
       .collection(AppString.NODE_USERS)
       .doc(this.state.id)
@@ -106,12 +125,13 @@ export default class Profile extends Component {
   render() {
     return (
       <>
+        <Header
+          title="Edit Profile"
+          setLoading={this.props.setLoading}
+          showToast={this.props.showToast}
+          {...this.props}
+        ></Header>
         <div className="profile-container">
-          <Header
-            setLoading={this.props.setLoading}
-            showToast={this.props.showToast}
-            {...this.props}
-          ></Header>
           <img className="pro-avatar" alt="Avatar" src={this.state.photoUrl} />
           <div className="viewWrapInputFile">
             <img
@@ -130,36 +150,71 @@ export default class Profile extends Component {
               onChange={this.onChangeAvatar}
             />
           </div>
-
-          <span className="textLabel">Display Name:</span>
-          <input
-            className="textInput"
-            id="displayName"
-            name="displayName"
-            value={this.state.displayName ? this.state.displayName : ""}
-            placeholder="Your displayName..."
-            onChange={this.onChangeEvent}
-          />
-          <span className="textLabel">About me:</span>
-          <input
-            className="textInput"
-            id="aboutMe"
-            name="aboutMe"
-            value={this.state.aboutMe ? this.state.aboutMe : ""}
-            placeholder="Tell about yourself..."
-            onChange={this.onChangeEvent}
-          />
-          <div className="group-buttons" >
-            <Button variant="contained" onClick={this.goToDashboard}>
-              Go Back
-            </Button>
-            <Button
-              variant="contained"
-              onClick={this.uploadAvatar}
-              color="secondary" style={{marginLeft: "10px"}}
-            >
-              Update
-            </Button>
+          <div className="profile-form">
+              <FormControl>
+                <InputLabel htmlFor="displayName">Display Name:</InputLabel>
+                <Input
+                  id="displayName"
+                  value={this.state.displayName ? this.state.displayName : ""}
+                  onChange={this.onChangeEvent}
+                  placeholder="Your displayName..."
+                  name="displayName"
+                  aria-describedby="my-helper-text"
+                />
+                <FormHelperText id="my-helper-text">
+                  it will show.
+                </FormHelperText>
+              </FormControl>
+            <FormGroup row>
+              <FormControlLabel margin="normal"
+              labelPlacement="start"
+              control={
+                  <Switch
+                    checked={this.state.showDisplayName}
+                    onChange={this.onChangeEvent}
+                    name="showDisplayName"
+                    color="primary"
+                  />
+                }
+                label="Show Display Name"
+              />
+            </FormGroup>
+            <FormGroup row>
+              <FormControl>
+                <InputLabel htmlFor="aboutMe">About me:</InputLabel>
+                <Input
+                  id="aboutMe"
+                  value={this.state.aboutMe ? this.state.aboutMe : ""}
+                  onChange={this.onChangeEvent}
+                  placeholder="Tell about yourself..."
+                  name="aboutMe"
+                />
+              </FormControl>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={this.state.showProPhoto}
+                    onChange={this.onChangeEvent}
+                    name="showProPhoto"
+                    color="primary"
+                  />
+                }
+                label="Show Profile Photo"
+              />
+            </FormGroup>
+            <div className="group-buttons">
+              <Button variant="contained" onClick={this.goToDashboard}>
+                Go Back
+              </Button>
+              <Button
+                variant="contained"
+                onClick={this.uploadAvatar}
+                color="secondary"
+                style={{ marginLeft: "10px" }}
+              >
+                Update
+              </Button>
+            </div>
           </div>
         </div>
       </>

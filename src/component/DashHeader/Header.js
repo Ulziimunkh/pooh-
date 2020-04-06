@@ -67,7 +67,7 @@ class Header extends Component {
      return (
       <div className="root">
         <div className="header">
-          <span>Mango Chat</span>
+         <span>{this.props.title?? "Mango Chat"}</span>
          <div className="profile-menu-container">
            <div className="avatar">
           <Avatar
