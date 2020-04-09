@@ -43,7 +43,7 @@ icSend: {
     boxSizing: 'border-box',
     overflow: 'auto',
     width:'100%',
-    // boxShadow: '2px 0px 0px black',
+    boxShadow: '2px 0px 0px black'
     // width: 'calc(100% - 300px - 50px)'
   },
 

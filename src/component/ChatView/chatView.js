@@ -2,7 +2,10 @@ import React from "react";
 import styles from "./styles";
 import { withStyles } from "@material-ui/core/styles";
 import WelcomeBoard from "../WelcomeBoard/WelcomeBoard";
-
+import Avatar from '@material-ui/core/Avatar';
+import IconButton from '@material-ui/core/IconButton';
+import MoreIcon from '@material-ui/icons/MoreVert';
+import ChatLeave from './ChatLeave';
 class ChatViewComponent extends React.Component {
   componentDidMount = () => {
     const container = document.getElementById("chatview-container");
@@ -25,10 +28,15 @@ class ChatViewComponent extends React.Component {
       return (
         <div className={classes.root}>
           <div className={classes.chatHeader}>
-            Your conversation with{" "}
+          <Avatar alt="User Name" className={classes.orange}>{(this.props.chat.hostId === this.props.userId ? this.props.chat.clientAlias : this.props.chat.hostAlias).split('')[0] }</Avatar>
+           <span className={classes.textHeaderChatBoard}>
             {this.props.chat.hostId === this.props.userId
               ? this.props.chat.clientAlias
               : this.props.chat.hostAlias}
+              </span>
+              <div className={classes.chatHeaderMore}>
+                 <ChatLeave selectedChat = {this.props.chat} currentUserId= {this.props.userId}/>
+              </div>
           </div>
           <main id="chatview-container" className={classes.content}>
             {this.props.chat.messages.map((_msg, _index) => {
@@ -37,8 +45,8 @@ class ChatViewComponent extends React.Component {
                   key={_index}
                   className={
                     _msg.sender === this.props.userId
-                      ? classes.friendSent
-                      : classes.userSent
+                      ? classes.userSent
+                      : classes.friendSent
                   }
                 >
                   {_msg.message}

@@ -4,9 +4,10 @@ import Menu from '@material-ui/core/Menu';
 import MenuItem from '@material-ui/core/MenuItem';
 import MoreVertIcon from '@material-ui/icons/MoreVert';
 import CustomDialog from '../Dialog/CustomDialog';
+import { myFirestore} from "../../Config/MyFirebase";
 
 const ITEM_HEIGHT = 22;
-export default function Test() {
+export default function ChatLeave(props) {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [leaveDialog, setLeaveDialog] = React.useState(false);
   const open = Boolean(anchorEl);
@@ -18,12 +19,20 @@ export default function Test() {
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const hideDialogConfirmLogout = () => {
+  const hideDialogConfirmNo = () => {
     setLeaveDialog(false);
   };
   const doLeave = () =>{
     setLeaveDialog(false);
-
+    let selectedChat = props.selectedChat;
+    myFirestore
+    .collection("chats")
+    .doc(selectedChat.chatId)
+    .update({
+      isActive: false,
+      deactivedDate: new Date(),
+      deactivedBy: props.currentUserId
+    });
   }
   const onClickLeave = () =>{
       setLeaveDialog(true);
@@ -33,9 +42,9 @@ export default function Test() {
       if(leaveDialog){
         return (
           <CustomDialog
-            title="Are you sure to logout?"
+            title="Make sure to leave chat"
             handleCloseYes={doLeave}
-            handleCloseNo={hideDialogConfirmLogout}
+            handleCloseNo={hideDialogConfirmNo}
             open={leaveDialog}
           />)
       }

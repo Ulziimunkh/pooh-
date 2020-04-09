@@ -170,7 +170,7 @@ export default function Header(props) {
   
      return (
       <div className={classes.grow}>
-      <AppBar position="static">
+      <AppBar position="static" elevation={0}>
         <Toolbar>
           <IconButton onClick={props.toggleSideBar}
             edge="start"

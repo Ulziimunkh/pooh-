@@ -1,6 +1,7 @@
 var CACHE_NAME = 'mango-chat-cache';
 var urlsToCache = [
-  '/'
+  '/',
+  '/static/'
 ];
 
 // Install a service worker
