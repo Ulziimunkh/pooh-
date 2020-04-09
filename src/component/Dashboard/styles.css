@@ -20,7 +20,10 @@
   grid-area: chatText;
   position: relative;
 }
-
+.chatList-container.disable {
+  /* grid-area: chatList; */
+  display: none;
+}
 @media only screen and (min-width: 768px){
   .dashboard-content {
     display: grid;
@@ -35,12 +38,12 @@
   .chatList-container {
     display: block;
   }
+  .chatList-container.disable {
+    /* grid-area: chatList; */
+    display: block;
+  }
 }
 .chatList-container.enable {
   /* grid-area: chatList; */
   display: block;
-}
-.chatList-container.disable {
-  /* grid-area: chatList; */
-  display: none;
 }
