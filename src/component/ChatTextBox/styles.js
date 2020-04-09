@@ -40,12 +40,11 @@ icSend: {
   marginRight: '5px'
 },
   chatTextBoxContainer: {
-    position: 'absolute',
-    bottom: '15px',
-    left: '315px',
     boxSizing: 'border-box',
     overflow: 'auto',
-    width: 'calc(100% - 300px - 50px)'
+    width:'100%',
+    // boxShadow: '2px 0px 0px black',
+    // width: 'calc(100% - 300px - 50px)'
   },
 
   chatTextBox: {

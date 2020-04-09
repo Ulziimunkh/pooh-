@@ -1,11 +1,8 @@
 const styles = theme => ({
     root: {
+      height: 'calc(100vh - 80px)',
       backgroundColor: theme.palette.background.paper,
-      height: 'calc(100% - 80px)',
-      position: 'absolute',
-      left: '0',
-      width: '300px',
-      boxShadow: '0px 0px 2px black'
+      boxShadow: '0px 0px 2px black',
     },
     listItem: {
       cursor: 'pointer'

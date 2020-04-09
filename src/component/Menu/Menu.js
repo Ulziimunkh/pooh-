@@ -63,7 +63,7 @@ export default function MenuListComposition(props) {
         >
          <ArrowDropDownIcon/>
         </Button>
-        <Popper open={open} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
+        <Popper open={open} style={{zIndex:"1"}} anchorEl={anchorRef.current} role={undefined} transition disablePortal>
           {({ TransitionProps, placement }) => (
             <Grow
               {...TransitionProps}

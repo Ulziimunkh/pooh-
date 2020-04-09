@@ -3,10 +3,10 @@ import NewChatComponent from "../NewChat/newChat";
 import ChatListComponent from "../ChatList/ChatList";
 import ChatViewComponent from "../ChatView/chatView";
 import ChatTextBoxComponent from "../ChatTextBox/chatTextBox";
-import styles from "./styles";
-import { Button, withStyles } from "@material-ui/core";
-import 'react-toastify/dist/ReactToastify.css'
-import {AppString} from '../../Config/AppString'
+import "./styles.css";
+import { withStyles } from "@material-ui/core";
+import "react-toastify/dist/ReactToastify.css";
+import { AppString } from "../../Config/AppString";
 import { myFirestore, myFirebase } from "../../Config/MyFirebase";
 import Header from "../DashHeader/Header";
 
@@ -17,59 +17,82 @@ import Header from "../DashHeader/Header";
 
 // I will be using both .then and async/await
 // in this tutorial to give a feel of both.
+const styles = theme =>({
+  chatViewEnable: {
+    display: 'block'
+  },
+  chatViewDisable: {
+    display: 'none',
+    [theme.breakpoints.up('sm')]: {
+      display: 'block'
+    },
+  }
+});
 
 class DashboardComponent extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      currentUser: null, // logged user
+      currentUser: null, // logged user7
       currentPeerUser: null, // current selected chat User
       selectedChat: null,
       newChatFormVisible: false,
+      isSideBarIsOpen: true,
       userId: null,
       friends: [],
-      chats: []
+      chats: [],
     };
     this.props.setLoading(true);
   }
-
+toggleSideMenu = () =>{
+  if(this.state.isSideBarIsOpen){
+    this.setState({isSideBarIsOpen: false});
+  }else{
+    this.setState({isSideBarIsOpen: true});
+  }
+}
   render() {
-    const { classes } = this.props;
-
+    const {classes} = this.props;
     if (this.state.userId) {
       return (
         <div className="dashboard-container" id="dashboard-container">
-          <Header setLoading={this.props.setLoading} showToast={this.props.showToast} {...this.props}></Header>
-          <ChatListComponent
-            history={this.props.history}
-            userId={this.state.userId}
-            selectChatFn={this.selectChat}
-            chats={this.state.chats}
-            selectedChatIndex={this.state.selectedChat}
-            newChatBtnFn={this.newChatBtnClicked}
-          ></ChatListComponent>
-          {this.state.newChatFormVisible ? null : (
-            <ChatViewComponent
-              userId={this.state.userId}
-              chat={this.state.chats[this.state.selectedChat]}
-            ></ChatViewComponent>
-          )}
-          {this.state.selectedChat !== null &&
-          !this.state.newChatFormVisible ? (
-            <ChatTextBoxComponent
-              userClickedInputFn={this.messageRead}
-              submitMessageFn={this.submitMessage}
-            ></ChatTextBoxComponent>
-          ) : null}
-          {this.state.newChatFormVisible ? (
-            <NewChatComponent
-              goToChatFn={this.goToChat}
-              newChatSubmitFn={this.newChatSubmit}
-            ></NewChatComponent>
-          ) : null}
-          <Button  className={classes.signOutBtn}>
-            
-          </Button>
+          <Header toggleSideBar = {this.toggleSideMenu}
+            setLoading={this.props.setLoading}
+            showToast={this.props.showToast}
+            {...this.props}
+          ></Header>
+          <div className="dashboard-content">
+            <div className={this.state.isSideBarIsOpen ? 'chatList-container enable': 'chatList-container disable'}>
+              <ChatListComponent
+                history={this.props.history}
+                userId={this.state.userId}
+                selectChatFn={this.selectChat}
+                chats={this.state.chats}
+                selectedChatIndex={this.state.selectedChat}
+                newChatBtnFn={this.newChatBtnClicked}
+              ></ChatListComponent>
+            </div>
+          <div className={this.state.isSideBarIsOpen ? classes.chatViewDisable: classes.chatViewEnable}>
+            {this.state.newChatFormVisible ? null : (
+              <div className="chatView-container">
+              <ChatViewComponent
+                userId={this.state.userId}
+                chat={this.state.chats[this.state.selectedChat]}
+              ></ChatViewComponent>
+              </div>
+            )}
+            {this.state.selectedChat !== null &&
+            !this.state.newChatFormVisible ? (
+              <div className="chatText-container">
+              <ChatTextBoxComponent
+                userClickedInputFn={this.messageRead}
+                submitMessageFn={this.submitMessage}
+              ></ChatTextBoxComponent>
+              </div>
+            ) : null}
+           
+          </div>
+          </div>
         </div>
       );
     } else {
@@ -79,7 +102,7 @@ class DashboardComponent extends React.Component {
 
   signOut = () => myFirebase.auth().signOut();
 
-  submitMessage = msg => {
+  submitMessage = (msg) => {
     const docKey = this.state.chats[this.state.selectedChat].chatId;
 
     myFirestore
@@ -89,27 +112,27 @@ class DashboardComponent extends React.Component {
         messages: myFirebase.firestore.FieldValue.arrayUnion({
           sender: this.state.userId,
           message: msg,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         }),
-        receiverHasRead: false
+        receiverHasRead: false,
       });
   };
 
   newChatBtnClicked = () => this.newChatSubmit();
 
-  newChatSubmit = async chatObj => {
+  newChatSubmit = async (chatObj) => {
     console.log("email", this.state.userId);
     if (this.state.chats.length < 3) {
       await myFirestore
         .collection("users")
         //.where('email', '>=', this.state.email)
-        .onSnapshot(async res => {
+        .onSnapshot(async (res) => {
           const friends = res.docs
-           .filter(doc => doc.data().id !== this.state.userId)
-            .map(_doc => _doc.data());
+            .filter((doc) => doc.data().id !== this.state.userId)
+            .map((_doc) => _doc.data());
           await this.setState({
             userId: this.state.userId,
-            friends: friends
+            friends: friends,
           });
           if (this.state.friends.length > 0) {
             console.log("friends", this.state.friends);
@@ -129,8 +152,8 @@ class DashboardComponent extends React.Component {
                       message:
                         "Welcome to Mango chat!. Your chat has started. Enjoy!",
                       sender: this.state.userId,
-                      timestamp: tempId
-                    }
+                      timestamp: tempId,
+                    },
                   ],
                   hostId: this.state.userId,
                   hostAlias: "Host-" + tempUserId,
@@ -139,12 +162,12 @@ class DashboardComponent extends React.Component {
                   users: [this.state.userId, winner.id],
                   receiverHasRead: false,
                   isActive: true,
-                  createdDate: new Date()
+                  createdDate: new Date(),
                 })
-                .then(async r => {
+                .then(async (r) => {
                   await this.selectChat(this.state.chats.length - 1);
                 })
-                .catch(e => {
+                .catch((e) => {
                   console.log("error add chat", e);
                 });
             } else {
@@ -158,19 +181,20 @@ class DashboardComponent extends React.Component {
     this.setState({ newChatFormVisible: false });
   };
 
-  selectChat = async chatIndex => {
+  selectChat = async (chatIndex) => {
     console.log("chatIndex:", chatIndex);
+    this.toggleSideMenu();
     if (this.state.chats.length > 0 && chatIndex >= 0) {
       await this.setState({
         selectedChat: chatIndex,
-        newChatFormVisible: false
+        newChatFormVisible: false,
       });
       this.messageRead();
     }
   };
 
   goToChat = async (docKey, msg) => {
-    const chat = this.state.chats.find(_chat => _chat.chatId === docKey);
+    const chat = this.state.chats.find((_chat) => _chat.chatId === docKey);
     this.setState({ newChatFormVisible: false });
     await this.selectChat(this.state.chats.indexOf(chat));
     this.submitMessage(msg);
@@ -192,29 +216,40 @@ class DashboardComponent extends React.Component {
     }
   };
 
-  clickedMessageWhereNotSender = chatIndex =>
+  clickedMessageWhereNotSender = (chatIndex) =>
     this.state.chats[chatIndex].messages[
       this.state.chats[chatIndex].messages.length - 1
     ].sender !== this.state.userId;
 
   downloadUserData = async (uid) => {
     const result = await myFirestore
-    .collection("users")
-    .where(AppString.ID, '==', uid).get();
-    if(result.docs.length > 0) {
+      .collection("users")
+      .where(AppString.ID, "==", uid)
+      .get();
+    if (result.docs.length > 0) {
       // Write user info to local
       const userExist = result.docs[0].data();
-      this.setState({currentUser: userExist});
-      localStorage.setItem(AppString.ID, uid)
-      localStorage.setItem( AppString.DISPLAYNAME, userExist.displayName)
-      localStorage.setItem(AppString.PHOTO_URL, userExist.photoURL)
-      localStorage.setItem(AppString.ABOUT_ME, userExist.aboutMe)
+      this.setState({ currentUser: userExist });
+      localStorage.setItem(AppString.ID, uid);
+      localStorage.setItem(AppString.DISPLAYNAME, userExist.displayName);
+      localStorage.setItem(AppString.PHOTO_URL, userExist.photoURL);
+      localStorage.setItem(AppString.ABOUT_ME, userExist.aboutMe);
+      localStorage.setItem(AppString.GENDER, userExist.gender);
+      localStorage.setItem(AppString.BIRTHDAY, userExist.birthday);
+      localStorage.setItem(
+        AppString.SHOW_DISPLAYNAME,
+        userExist.showDisplayName
+      );
+      localStorage.setItem(AppString.SHOW_PROPHOTO, userExist.showProPhoto);
+      localStorage.setItem(AppString.SHOW_GENDER, userExist.showGender);
+      localStorage.setItem(AppString.INTERESTEDIN, userExist.interestedIn);
+      localStorage.setItem(AppString.AGE_RANGE, userExist.ageRange);
     }
-  }
+  };
   componentWillMount = () => {
     document.getElementsByTagName("BODY")[0].classList.remove("home-page");
     this.props.setLoading(true);
-    myFirebase.auth().onAuthStateChanged(async _usr => {
+    myFirebase.auth().onAuthStateChanged(async (_usr) => {
       if (!_usr) this.props.history.push("/");
       else {
         // GET Profile data
@@ -222,14 +257,14 @@ class DashboardComponent extends React.Component {
           this.downloadUserData(_usr.uid);
           //this.props.showToast(1, 'Login success')
         }
-        // Get Chat List ########################### 
+        // Get Chat List ###########################
         await myFirestore
           .collection("chats")
           .where("isActive", "==", true)
           .where("users", "array-contains", _usr.uid)
-          .onSnapshot(async res => {
+          .onSnapshot(async (res) => {
             const chats = res.docs
-              .map(_doc => ({ ..._doc.data(), chatId: _doc.id }))
+              .map((_doc) => ({ ..._doc.data(), chatId: _doc.id }))
               .sort(
                 (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
               );
@@ -238,7 +273,7 @@ class DashboardComponent extends React.Component {
             await this.setState({
               userId: _usr.uid,
               chats: chats,
-              friends: []
+              friends: [],
             });
           });
       }

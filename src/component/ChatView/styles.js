@@ -1,15 +1,13 @@
 const styles = theme => ({
-
+  root:{
+   
+  },
   content: {
-    height: 'calc(100vh - 120px)',
+    height: 'calc(100vh - 170px)',
     overflow: 'auto',
     padding: '25px',
-    marginLeft: '300px',
     boxSizing: 'border-box',
-    overflowY: 'scroll',
-    top: '120px',
-    width: 'calc(100% - 300px)',
-    position: 'absolute'
+    overflowY: 'scroll'
   },
 
   userSent: {
@@ -39,11 +37,10 @@ const styles = theme => ({
   },
 
   chatHeader: {
-    width: 'calc(100% - 301px)',
     height: '50px',
     backgroundColor: '#344195',
-    position: 'fixed',
-    marginLeft: '301px',
+    position: 'sticky',
+    top:'0',
     fontSize: '18px',
     textAlign: 'center',
     color: 'white',

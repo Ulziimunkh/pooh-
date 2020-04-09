@@ -23,7 +23,7 @@ class ChatViewComponent extends React.Component {
       );
     } else if (this.props.chat !== undefined) {
       return (
-        <div>
+        <div className={classes.root}>
           <div className={classes.chatHeader}>
             Your conversation with{" "}
             {this.props.chat.hostId === this.props.userId
