@@ -1,4 +1,4 @@
-var CACHE_NAME = 'mango-chat-cache';
+var CACHE_NAME = 'mango-chat-cache1';
 var urlsToCache = [
   '/',
   '/static/'
