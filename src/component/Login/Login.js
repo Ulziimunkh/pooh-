@@ -38,10 +38,10 @@ class Login extends Component
         ]
       },
       myFirebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      {
-        provider: myFirebase.auth.PhoneAuthProvider.PROVIDER_ID,
-        defaultCountry: "IN"
-      }
+      // {
+      //   provider: myFirebase.auth.PhoneAuthProvider.PROVIDER_ID,
+      //   defaultCountry: "IN"
+      // }
     ],
     callbacks: {
       signInSuccessWithAuthResult: (authResult, redirectUrl) => {

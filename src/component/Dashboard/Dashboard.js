@@ -9,6 +9,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AppString } from "../../Config/AppString";
 import { myFirestore, myFirebase } from "../../Config/MyFirebase";
 import Header from "../DashHeader/Header";
+import moment from 'moment';
 
 // I need to investigate why sometimes
 // two messages will send instead of just
@@ -17,16 +18,16 @@ import Header from "../DashHeader/Header";
 
 // I will be using both .then and async/await
 // in this tutorial to give a feel of both.
-const styles = theme =>({
+const styles = (theme) => ({
   chatViewEnable: {
-    display: 'block'
+    display: "block",
   },
   chatViewDisable: {
-    display: 'none',
-    [theme.breakpoints.up('sm')]: {
-      display: 'block'
+    display: "none",
+    [theme.breakpoints.up("sm")]: {
+      display: "block",
     },
-  }
+  },
 });
 
 class DashboardComponent extends React.Component {
@@ -44,25 +45,32 @@ class DashboardComponent extends React.Component {
     };
     this.props.setLoading(true);
   }
-toggleSideMenu = () =>{
-  if(this.state.isSideBarIsOpen){
-    this.setState({isSideBarIsOpen: false});
-  }else{
-    this.setState({isSideBarIsOpen: true});
-  }
-}
+  toggleSideMenu = () => {
+    if (this.state.isSideBarIsOpen) {
+      this.setState({ isSideBarIsOpen: false });
+    } else {
+      this.setState({ isSideBarIsOpen: true });
+    }
+  };
   render() {
-    const {classes} = this.props;
+    const { classes } = this.props;
     if (this.state.userId) {
       return (
         <div className="dashboard-container" id="dashboard-container">
-          <Header toggleSideBar = {this.toggleSideMenu}
+          <Header
+            toggleSideBar={this.toggleSideMenu}
             setLoading={this.props.setLoading}
             showToast={this.props.showToast}
             {...this.props}
           ></Header>
           <div className="dashboard-content">
-            <div className={this.state.isSideBarIsOpen ? 'chatList-container enable': 'chatList-container disable'}>
+            <div
+              className={
+                this.state.isSideBarIsOpen
+                  ? "chatList-container enable"
+                  : "chatList-container disable"
+              }
+            >
               <ChatListComponent
                 history={this.props.history}
                 userId={this.state.userId}
@@ -72,26 +80,34 @@ toggleSideMenu = () =>{
                 newChatBtnFn={this.newChatBtnClicked}
               ></ChatListComponent>
             </div>
-          <div className={this.state.isSideBarIsOpen ? classes.chatViewDisable: classes.chatViewEnable}>
-            {this.state.newChatFormVisible ? null : (
-              <div className="chatView-container">
-              <ChatViewComponent
-                userId={this.state.userId}
-                chat={this.state.chats[this.state.selectedChat]}
-              ></ChatViewComponent>
-              </div>
-            )}
-            {this.state.selectedChat !== null &&
-            !this.state.newChatFormVisible ? (
-              <div className="chatText-container">
-              <ChatTextBoxComponent
-                userClickedInputFn={this.messageRead}
-                submitMessageFn={this.submitMessage}
-              ></ChatTextBoxComponent>
-              </div>
-            ) : null}
-           
-          </div>
+            <div
+              className={
+                this.state.isSideBarIsOpen
+                  ? classes.chatViewDisable
+                  : classes.chatViewEnable
+              }
+            >
+              {this.state.newChatFormVisible ? null : (
+                <div className="chatView-container">
+                  <ChatViewComponent
+                    userId={this.state.userId}
+                    setLoading={this.props.setLoading}
+                    chat={this.state.chats[this.state.selectedChat]}
+                  ></ChatViewComponent>
+                </div>
+              )}
+              {this.state.selectedChat !== null &&
+              !this.state.newChatFormVisible ? (
+                <div className="chatText-container">
+                  <ChatTextBoxComponent   userId={this.state.userId} 
+                   setLoading={this.props.setLoading}
+                   chatId={this.state.chats[this.state.selectedChat].chatId}
+                    userClickedInputFn={this.messageRead}
+                    submitMessageFn={this.submitMessage}
+                  ></ChatTextBoxComponent>
+                </div>
+              ) : null}
+            </div>
           </div>
         </div>
       );
@@ -102,17 +118,18 @@ toggleSideMenu = () =>{
 
   signOut = () => myFirebase.auth().signOut();
 
-  submitMessage = (msg) => {
+  submitMessage = (msg, type) => {
     const docKey = this.state.chats[this.state.selectedChat].chatId;
-
+    const timestamp = Date.now();
     myFirestore
       .collection("chats")
       .doc(docKey)
       .update({
         messages: myFirebase.firestore.FieldValue.arrayUnion({
+          type: type,
           sender: this.state.userId,
           message: msg,
-          timestamp: Date.now(),
+          timestamp: timestamp,
         }),
         receiverHasRead: false,
       });
@@ -152,13 +169,14 @@ toggleSideMenu = () =>{
                       message:
                         "Welcome to Mango chat!. Your chat has started. Enjoy!",
                       sender: this.state.userId,
+                      type: 0,
                       timestamp: tempId,
                     },
                   ],
                   hostId: this.state.userId,
-                  hostAlias: "Host-" + tempUserId,
+                  hostAlias: "User-" + tempUserId,
                   clientId: winner.id,
-                  clientAlias: "Client-" + tempUserId,
+                  clientAlias: "User-" + tempUserId,
                   users: [this.state.userId, winner.id],
                   receiverHasRead: false,
                   isActive: true,
@@ -221,11 +239,16 @@ toggleSideMenu = () =>{
       this.state.chats[chatIndex].messages.length - 1
     ].sender !== this.state.userId;
 
-  downloadUserData = async (uid) => {
-    const result = await myFirestore
+  getUserById = (uid) => {
+    const result = myFirestore
       .collection("users")
       .where(AppString.ID, "==", uid)
       .get();
+    return result;
+  };
+  downloadUserData = async (uid) => {
+    const result = await this.getUserById(uid);
+    // console.log("DashboardComponent -> downloadUserData -> result", result)
     if (result.docs.length > 0) {
       // Write user info to local
       const userExist = result.docs[0].data();
@@ -246,6 +269,36 @@ toggleSideMenu = () =>{
       localStorage.setItem(AppString.AGE_RANGE, userExist.ageRange);
     }
   };
+  downloadUserChatList = async (uid) => {
+    
+    myFirestore
+      .collection("chats")
+      .where("isActive", "==", true)
+      .where("users", "array-contains", uid)
+      .onSnapshot(async (res) => {
+        var chats = [];
+        res.docs.forEach(async (_doc) => {
+          var peerId = await _doc.data().users.filter((ids) => ids !== uid)[0];
+          let peerUser = await this.getUserById(peerId);
+          chats.push({
+            ..._doc.data(),
+            chatId: _doc.id,
+            peerUser: peerUser.docs[0].data(),
+          });
+          this.props.setLoading(false);
+
+          console.log(
+            "DashboardComponent -> downloadUserChatList -> chats",
+            chats
+          );
+          await this.setState({
+            userId: uid,
+            chats: chats,
+            friends: [],
+          });
+        });
+      });
+  };
   componentWillMount = () => {
     document.getElementsByTagName("BODY")[0].classList.remove("home-page");
     this.props.setLoading(true);
@@ -258,24 +311,7 @@ toggleSideMenu = () =>{
           //this.props.showToast(1, 'Login success')
         }
         // Get Chat List ###########################
-        await myFirestore
-          .collection("chats")
-          .where("isActive", "==", true)
-          .where("users", "array-contains", _usr.uid)
-          .onSnapshot(async (res) => {
-            const chats = res.docs
-              .map((_doc) => ({ ..._doc.data(), chatId: _doc.id }))
-              .sort(
-                (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
-              );
-            console.log("chats", chats);
-            this.props.setLoading(false);
-            await this.setState({
-              userId: _usr.uid,
-              chats: chats,
-              friends: [],
-            });
-          });
+        this.downloadUserChatList(_usr.uid);
       }
     });
   };

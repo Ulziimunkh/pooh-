@@ -3,12 +3,20 @@ const styles = theme => ({
    
   },
   content: {
-    height: 'calc(100vh - 170px)',
+    height: 'calc(100vh - 238px)',
+    [theme.breakpoints.up('sm')]: {
+      height: 'calc(100vh - 320x)',
+    },
     overflow: 'auto',
-    padding: '25px',
+    display: 'flex',
+    flex: '1 1',
+    flexDirection: 'column',
+    padding: '20px',
     boxSizing: 'border-box',
-    overflowY: 'scroll'
+    // overflowY: 'scroll'
+    // paddingBottom: '20px'
   },
+  
 
   friendSent: {
     float: 'left',

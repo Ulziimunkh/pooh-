@@ -1,44 +1,159 @@
-import React from 'react';
-import TextField from '@material-ui/core/TextField';
-import Send from '@material-ui/icons/Send';
-import styles from './styles';
-import { withStyles } from '@material-ui/core/styles';
-
+import React from "react";
+import TextField from "@material-ui/core/TextField";
+import Send from "@material-ui/icons/Send";
+import styles from "./styles";
+import { withStyles } from "@material-ui/core/styles";
+import images from "../Themes/Images";
+import {AppString} from "../../Config/AppString";
+import { myStorage, myFirestore, myFirebase } from "../../Config/MyFirebase";
+import moment from "moment";
 class ChatTextBoxComponent extends React.Component {
-
   constructor() {
     super();
     this.state = {
-      chatText: ''
+      chatText: "",
+      isShowSticker: false,
     };
+    this.currentPhotoFile = null;
   }
+  // IMAGE ---------------------------->
 
-  render() {
+  onChoosePhoto = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      this.props.setLoading(true);
+      this.currentPhotoFile = event.target.files[0];
+      // Check this file is an image?
+      const prefixFiletype = event.target.files[0].type.toString();
+      if (prefixFiletype.indexOf(AppString.PREFIX_IMAGE) === 0) {
+        this.uploadPhoto();
+      } else {
+        this.props.setLoading(false);
+        this.props.showToast(0, "This file is not an image");
+      }
+    } else {
+      this.props.setLoading(false);
+    }
+  };
 
-    const { classes } = this.props;
+  uploadPhoto = () => {
+    if (this.currentPhotoFile) {
+      const timestamp = moment().valueOf().toString();
 
-    return(
-      <div className={classes.chatTextBoxContainer}>
-        <TextField autoComplete="off"
-          placeholder='Type your message..' 
-          onKeyUp={(e) => this.userTyping(e)}
-          id='chattextbox' 
-          className={classes.chatTextBox}
-          onFocus={this.userClickedInput}>
-        </TextField>
-        <Send onClick={this.submitMessage} className={classes.sendBtn}></Send>
+      const uploadTask = myStorage
+        .ref()
+        .child("chatImages/")
+        .child(this.props.userId + '/')
+        .child(this.props.chatId + '/')
+        .child(timestamp)
+        .put(this.currentPhotoFile);
+
+      uploadTask.on(
+        AppString.UPLOAD_CHANGED,
+        null,
+        (err) => {
+          this.props.setLoading(false);
+          this.props.showToast(0, err.message);
+        },
+        () => {
+          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+            this.props.setLoading(false);
+            this.submitMessage(downloadURL, 1);
+          });
+        }
+      );
+    } else {
+      this.props.setLoading(false);
+      this.props.showToast(0, "File is null");
+    }
+  };
+
+  // STICKER ----------------------->
+  openListSticker = () => {
+    this.setState({ isShowSticker: !this.state.isShowSticker });
+  };
+  renderStickers = () => {
+    let arr = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+    return (
+      <div className={this.props.classes.viewStickers}>
+        {arr.map((val, i) => {
+          return (
+            <img
+              key={i}
+              className={this.props.classes.imgSticker}
+              src={images["mimi" + val]}
+              alt="sticker"
+              onClick={() => this.submitMessage("mimi" + val, 2)}
+            />
+          );
+        })}
       </div>
     );
+  };
+
+  render() {
+    const { classes } = this.props;
+
+    return (
+      <>
+        {/* // Stickers */}
+        {this.state.isShowSticker ? this.renderStickers() : null}
+
+        <div className={classes.viewBottom}>
+          <img
+            className={classes.icOpenGallery}
+            src={images.ic_photo}
+            alt="icon open gallery"
+            onClick={() => this.refInput.click()}
+          />
+          <input
+            ref={(el) => {
+              this.refInput = el;
+            }}
+            accept="image/*"
+            className={classes.viewInputGallery}
+            type="file"
+            onChange={this.onChoosePhoto}
+          />
+
+          <img
+            className={classes.icOpenSticker}
+            src={images.ic_sticker}
+            alt="icon open sticker"
+            onClick={this.openListSticker}
+          />
+          <TextField
+            autoComplete="off"
+            className={classes.viewInput}
+            placeholder="Type your message.."
+            // value={this.state.chatText}
+            onKeyUp={(e) => this.userTyping(e)}
+            id="chattextbox"
+            onFocus={this.userClickedInput}
+          ></TextField>
+          <Send
+            onClick={() => this.submitMessage(this.state.chatText, 0)}
+            className={classes.sendBtn}
+          ></Send>
+        </div>
+      </>
+    );
   }
-  userTyping = (e) => e.keyCode === 13 ? this.submitMessage() : this.setState({ chatText: e.target.value });
-  messageValid = (txt) => txt && txt.replace(/\s/g, '').length;
+  userTyping = (e) => {
+    if (e.keyCode === 13) {
+      this.submitMessage(this.state.chatText, 0);
+    } else this.setState({ chatText: e.target.value });
+  };
+  messageValid = (txt) => txt && txt.replace(/\s/g, "").length;
   userClickedInput = () => this.props.userClickedInputFn();
-  submitMessage = () => {
-    if(this.messageValid(this.state.chatText)) {
-      this.props.submitMessageFn(this.state.chatText);
-      document.getElementById('chattextbox').value = '';
+  submitMessage = (content, type) => {
+    if (this.state.isShowSticker && type === 2) {
+      this.setState({ isShowSticker: false });
     }
-  }
+    if (this.messageValid(content)) {
+      this.props.submitMessageFn(content, type);
+      if (type === 0) document.getElementById("chattextbox").value = "";
+    }
+  };
 }
 
 export default withStyles(styles)(ChatTextBoxComponent);

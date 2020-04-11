@@ -6,6 +6,8 @@ import Avatar from '@material-ui/core/Avatar';
 import IconButton from '@material-ui/core/IconButton';
 import MoreIcon from '@material-ui/icons/MoreVert';
 import ChatLeave from './ChatLeave';
+import ChatMessage from './ChatMessage/ChatMessage'
+import moment from 'moment'
 class ChatViewComponent extends React.Component {
   componentDidMount = () => {
     const container = document.getElementById("chatview-container");
@@ -28,7 +30,7 @@ class ChatViewComponent extends React.Component {
       return (
         <div className={classes.root}>
           <div className={classes.chatHeader}>
-          <Avatar alt="User Name" className={classes.orange}>{(this.props.chat.hostId === this.props.userId ? this.props.chat.clientAlias : this.props.chat.hostAlias).split('')[0] }</Avatar>
+          <Avatar alt="User Name" src={this.props.chat.peerUser.photoURL} className={classes.orange}>{(this.props.chat.hostId === this.props.userId ? this.props.chat.clientAlias : this.props.chat.hostAlias).split('')[0] }</Avatar>
            <span className={classes.textHeaderChatBoard}>
             {this.props.chat.hostId === this.props.userId
               ? this.props.chat.clientAlias
@@ -40,17 +42,30 @@ class ChatViewComponent extends React.Component {
           </div>
           <main id="chatview-container" className={classes.content}>
             {this.props.chat.messages.map((_msg, _index) => {
-              return (
-                <div
-                  key={_index}
-                  className={
-                    _msg.sender === this.props.userId
-                      ? classes.userSent
-                      : classes.friendSent
+              let showTimeStamp = false;
+              let chatTime = moment(_msg.timestamp);
+              if(moment().diff(chatTime, 'minutes') >= 5){
+                if(this.props.chat.messages.length-1 === _index){
+                  if(_msg.sender !== this.props.userId)
+                      showTimeStamp = true;
+                } else{
+                  if(_msg.sender !== this.props.chat.messages[_index +1].sender){
+                    showTimeStamp = true;
                   }
-                >
-                  {_msg.message}
-                </div>
+                }
+              }
+              return (
+                <ChatMessage key={_index} peerUser ={this.props.chat.peerUser} showTimeStamp ={showTimeStamp} message={_msg} isMyMessage={_msg.sender === this.props.userId}/>
+                // <div
+                //   key={_index}
+                //   className={
+                //     _msg.sender === this.props.userId
+                //       ? classes.userSent
+                //       : classes.friendSent
+                //   }
+                // >
+                //   {_msg.message}
+                // </div>
               );
             })}
           </main>
