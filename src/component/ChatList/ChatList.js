@@ -11,7 +11,7 @@ import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import NotificationImportant from '@material-ui/icons/NotificationImportant';
-
+import images from "../Themes/Images";
 class ChatListComponent extends React.Component {
 
   render() {
@@ -31,6 +31,7 @@ class ChatListComponent extends React.Component {
             <List>
               {
                 this.props.chats.map((_chat, _index) => {
+                  let itsMe = _chat.hostId === this.props.userId;
                   return (
                     <div key={_index}>
                       <ListItem onClick={() => this.selectChat(_index)} 
@@ -38,15 +39,15 @@ class ChatListComponent extends React.Component {
                         selected={this.props.selectedChatIndex === _index} 
                         alignItems="flex-start">
                         <ListItemAvatar>
-                          <Avatar alt="User Name" className={classes.orange}>{(_chat.hostId === this.props.userId ? _chat.clientAlias : _chat.hostAlias).split('')[0] }</Avatar>
+                          <Avatar alt="User Name" src={_chat.peerUser.photoURL} className={classes.orange}>{(_chat.hostId === this.props.userId ? _chat.clientAlias : _chat.hostAlias).split('')[0] }</Avatar>
                         </ListItemAvatar>
                         <ListItemText 
-                          primary={_chat.hostId === this.props.userId ? _chat.clientAlias : _chat.hostAlias }
+                          primary={itsMe ? _chat.clientAlias : _chat.hostAlias }
                           secondary={
                             <React.Fragment>
                               <Typography component='span'
                                 color='textPrimary'>
-                                  {_chat.messages[_chat.messages.length - 1].message.substring(0, 30) + ' ...'}
+                                  {(this.userIsSender(_chat) ? 'You: ': '') +(_chat.messages[_chat.messages.length - 1].type === 0 ? _chat.messages[_chat.messages.length - 1].message.substring(0, 30) + (_chat.messages[_chat.messages.length - 1].message.length > 10 ? ' ...' :'.'): (this.userIsSender(_chat) ? '': _chat.peerUser.displayName + ': ')+ 'sent an attachment.' )}
                               </Typography>
                             </React.Fragment>
                           }/>
@@ -67,14 +68,14 @@ class ChatListComponent extends React.Component {
     } else {
       return(
         <div className={classes.root}>
-          <Button variant="contained" 
-            fullWidth 
-            color='primary' 
-            onClick={this.newChat} 
-            className={classes.newChatBtn}>
-              Start New Chat
-          </Button>
-          <List></List>
+          <div className="viewWrapSayHi">
+                <span className="textSayHi">Say hi to new friend</span>
+                <img
+                    className="imgWaveHand"
+                    src={images.ic_wave_hand}
+                    alt="wave hand"
+                />
+            </div>
         </div>
       );
     }

@@ -1,0 +1,49 @@
+.dashboard-content {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: repeat(auto, 3);
+  grid-template-areas:
+    "chatList"
+    "chatView"
+    "chatText";
+}
+.chatList-container {
+  grid-area: chatList;
+  display: none;
+}
+
+.chatView-container {
+  grid-area: chatView;
+  position: relative;
+}
+.chatText-container {
+  grid-area: chatText;
+  position: relative;
+}
+.chatList-container.disable {
+  /* grid-area: chatList; */
+  display: none;
+}
+@media only screen and (min-width: 768px){
+  .dashboard-content {
+    display: grid;
+    margin:0;
+    grid-template-columns: 25% auto;
+    grid-template-rows: auto 10%;
+    grid-template-areas:
+      "chatList chatView"
+      "chatList chatView"
+      "chatList chatText";
+  }
+  .chatList-container {
+    display: block;
+  }
+  .chatList-container.disable {
+    /* grid-area: chatList; */
+    display: block;
+  }
+}
+.chatList-container.enable {
+  /* grid-area: chatList; */
+  display: block;
+}

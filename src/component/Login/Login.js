@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 import {withRouter, Redirect} from 'react-router-dom'
 import { myFirestore, myFirebase } from "../../Config/MyFirebase";
+import {CalculateAge} from '../../Utils/Utils'
 class Login extends Component
 {
   constructor(props) {
@@ -37,10 +38,10 @@ class Login extends Component
         ]
       },
       myFirebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      {
-        provider: myFirebase.auth.PhoneAuthProvider.PROVIDER_ID,
-        defaultCountry: "IN"
-      }
+      // {
+      //   provider: myFirebase.auth.PhoneAuthProvider.PROVIDER_ID,
+      //   defaultCountry: "IN"
+      // }
     ],
     callbacks: {
       signInSuccessWithAuthResult: (authResult, redirectUrl) => {
@@ -56,6 +57,11 @@ class Login extends Component
             emailVerified: false,
             aboutMe: "Let's have fun.",
             providerId: authResult.additionalUserInfo.providerId,
+            ageRange: [16, 35],
+            interestedIn: "both",
+            showDisplayName: false,
+            showGender: false,
+            showProPhoto: false,
             createdDate: dt,
             lastSignedDate: dt
           };
@@ -81,6 +87,10 @@ class Login extends Component
               break;
           }
           if (additionalUserInfo.isNewUser) {
+            if(userObj.birthday){
+                let age = CalculateAge(new Date(this.state.birthday));
+                userObj.age = age;
+            }
             myFirestore
               .collection("users")
               .doc(user.uid)
@@ -145,7 +155,6 @@ class Login extends Component
   componentWillUnmount() {
     this.unregisterAuthObserver();
   }
-
   render() {
     if (!this.state.isSignedIn) {
     return (

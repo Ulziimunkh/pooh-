@@ -1,21 +1,36 @@
 import React, { Component } from "react";
-import Header from "../../component/DashHeader/Header";
 import { myStorage, myFirestore } from "../../Config/MyFirebase";
 import { AppString } from "../../Config/AppString";
 import "./Profile.css";
 import images from "../../component/Themes/Images";
+import NativeSelect from "@material-ui/core/NativeSelect";
+import {CalculateAge} from '../../Utils/Utils'
+import DateFnsUtils from "@date-io/date-fns";
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers";
 import {
   FormControlLabel,
-  FormGroup,
+  TextField,
+  Slider,
+  Typography,
+  FormHelperText,
+  CssBaseline,
+  Container,
   FormControl,
   InputLabel,
-  FormHelperText,
+  Grid,
   Input,
   Switch,
 } from "@material-ui/core";
-import { Button } from "@material-ui/core";
-const interestedInList = ["both", "male", "female"];
-export default class Profile extends Component {
+import { Button} from "@material-ui/core";
+const interestedInList = [
+  { value: "both", label: "Both" },
+  { value: "male", label: "Male" },
+  { value: "female", label: "Female" },
+];
+class Profile extends Component {
   // const {name, email, picture} = fb;
   constructor(props) {
     super(props);
@@ -25,9 +40,14 @@ export default class Profile extends Component {
       displayName: localStorage.getItem(AppString.DISPLAYNAME),
       aboutMe: localStorage.getItem(AppString.ABOUT_ME),
       photoUrl: localStorage.getItem(AppString.PHOTO_URL),
-      interestedIn: "both",
-      showDisplayName: false,
-      showProPhoto: false,
+      interestedIn: localStorage.getItem(AppString.INTERESTEDIN)?? 'both',
+      showDisplayName: localStorage.getItem(AppString.SHOW_DISPLAYNAME) === 'true',
+      showProPhoto: Boolean(localStorage.getItem(AppString.SHOW_PROPHOTO)) === 'true',
+      showGender: Boolean(localStorage.getItem(AppString.SHOW_GENDER)) === 'true',
+      gender: localStorage.getItem(AppString.GENDER)?? '',
+      birthday: localStorage.getItem(AppString.BIRTHDAY)?? new Date('01/01/2004'),
+      ageRange: localStorage.getItem(AppString.AGE_RANGE).split(',').map(Number)
+      
     };
     this.newAvatar = null;
     this.newPhotoUrl = "";
@@ -44,13 +64,18 @@ export default class Profile extends Component {
   goToDashboard = () => {
     this.props.history.push("/dashboard");
   };
+  handleChangeRange = (event, newValue) => {
+    this.setState({ ageRange: newValue });
+  };
+  handleChangeBirthday = (event, newValue) => {
+    this.setState({ birthday: newValue });
+  };
   onChangeEvent = (event) => {
     const name = event.target.name;
     console.log(
       "Profile -> onChangeEvent -> event.target.type",
       event.target.type
     );
-    console.log("Profile -> onChangeEvent -> name", name);
     const value =
       event.target.type === "checkbox"
         ? event.target.checked
@@ -95,15 +120,23 @@ export default class Profile extends Component {
       this.updateUserInfo(false, null);
     }
   };
+
   updateUserInfo = (isUpdatePhotoUrl, downloadURL) => {
     let newInfo = {
       displayName: this.state.displayName,
+      showDisplayName: this.state.showDisplayName,
       aboutMe: this.state.aboutMe,
-    };
-    let userConfig = {
+      gender: this.state.gender,
+      showGender: this.state.showGender,
+      birthday: this.state.birthday,
       interestedIn: this.state.interestedIn,
       showProPhoto: this.state.showProPhoto,
+      ageRange: this.state.ageRange,
     };
+    if(this.state.birthday){
+        let age = CalculateAge(new Date(this.state.birthday));
+        newInfo.age = age;
+    }
     if (isUpdatePhotoUrl) {
       newInfo.photoURL = downloadURL;
     }
@@ -115,6 +148,13 @@ export default class Profile extends Component {
       .then((data) => {
         localStorage.setItem(AppString.DISPLAYNAME, this.state.displayName);
         localStorage.setItem(AppString.ABOUT_ME, this.state.aboutMe);
+        localStorage.setItem(AppString.SHOW_DISPLAYNAME, this.state.showDisplayName);
+        localStorage.setItem(AppString.GENDER, this.state.gender);
+        localStorage.setItem(AppString.SHOW_GENDER, this.state.showGender);
+        localStorage.setItem(AppString.BIRTHDAY, this.state.birthday);
+        localStorage.setItem(AppString.INTERESTEDIN, this.state.interestedIn);
+        localStorage.setItem(AppString.SHOW_PROPHOTO, this.state.showProPhoto);
+        localStorage.setItem(AppString.AGE_RANGE, this.state.ageRange);
         if (isUpdatePhotoUrl) {
           localStorage.setItem(AppString.PHOTO_URL, downloadURL);
         }
@@ -125,72 +165,26 @@ export default class Profile extends Component {
   render() {
     return (
       <>
-        <Header
+        {/* <Header
           title="Edit Profile"
           setLoading={this.props.setLoading}
           showToast={this.props.showToast}
           {...this.props}
-        ></Header>
+        ></Header> */}
         <div className="profile-container">
-          <img className="pro-avatar" alt="Avatar" src={this.state.photoUrl} />
-          <div className="viewWrapInputFile">
-            <img
-              className="imgInputFile"
-              alt="icon gallery"
-              src={images.ic_input_file}
-              onClick={() => this.refInput.click()}
-            />
-            <input
-              ref={(el) => {
-                this.refInput = el;
-              }}
-              accept="image/*"
-              className="viewInputFile"
-              type="file"
-              onChange={this.onChangeAvatar}
-            />
-          </div>
-          <div className="profile-form">
-              <FormControl>
-                <InputLabel htmlFor="displayName">Display Name:</InputLabel>
-                <Input
-                  id="displayName"
-                  value={this.state.displayName ? this.state.displayName : ""}
-                  onChange={this.onChangeEvent}
-                  placeholder="Your displayName..."
-                  name="displayName"
-                  aria-describedby="my-helper-text"
-                />
-                <FormHelperText id="my-helper-text">
-                  it will show.
-                </FormHelperText>
-              </FormControl>
-            <FormGroup row>
-              <FormControlLabel margin="normal"
-              labelPlacement="start"
-              control={
-                  <Switch
-                    checked={this.state.showDisplayName}
-                    onChange={this.onChangeEvent}
-                    name="showDisplayName"
-                    color="primary"
-                  />
-                }
-                label="Show Display Name"
+          <div className="avatar-container">
+            <div className="avatar-img">
+              <img
+                className="pro-avatar"
+                alt="Avatar"
+                src={this.state.photoUrl}
               />
-            </FormGroup>
-            <FormGroup row>
-              <FormControl>
-                <InputLabel htmlFor="aboutMe">About me:</InputLabel>
-                <Input
-                  id="aboutMe"
-                  value={this.state.aboutMe ? this.state.aboutMe : ""}
-                  onChange={this.onChangeEvent}
-                  placeholder="Tell about yourself..."
-                  name="aboutMe"
-                />
-              </FormControl>
+            </div>
+            <div className="pro-control-container">
               <FormControlLabel
+                className="pro-controller"
+                margin="normal"
+                labelPlacement="end"
                 control={
                   <Switch
                     checked={this.state.showProPhoto}
@@ -199,25 +193,195 @@ export default class Profile extends Component {
                     color="primary"
                   />
                 }
-                label="Show Profile Photo"
+                label="Show"
               />
-            </FormGroup>
-            <div className="group-buttons">
-              <Button variant="contained" onClick={this.goToDashboard}>
-                Go Back
-              </Button>
-              <Button
-                variant="contained"
-                onClick={this.uploadAvatar}
-                color="secondary"
-                style={{ marginLeft: "10px" }}
-              >
-                Update
-              </Button>
+            </div>
+            <div className="viewWrapInputFile">
+              <img
+                className="imgInputFile"
+                alt="icon gallery"
+                src={images.ic_input_file}
+                onClick={() => this.refInput.click()}
+              />
+              <input
+                ref={(el) => {
+                  this.refInput = el;
+                }}
+                accept="image/*"
+                className="viewInputFile"
+                type="file"
+                onChange={this.onChangeAvatar}
+              />
             </div>
           </div>
+          <Container component="main" maxWidth="sm">
+            <CssBaseline />
+            <div className="profile-form">
+              <Grid container spacing={2}>
+                <Grid item xs={12} sm={6}>
+                  <FormControl style={{ width: "100%" }}>
+                    <TextField
+                      autoComplete="displayName"
+                      value={
+                        this.state.displayName ? this.state.displayName : ""
+                      }
+                      onChange={this.onChangeEvent}
+                      name="displayName"
+                      required
+                      id="displayName"
+                      label="Display Name"
+                      autoFocus
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl style={{ width: "100%" }}>
+                    <FormControlLabel
+                      margin="normal"
+                      labelPlacement="start"
+                      control={
+                        <Switch
+                          checked={this.state.showDisplayName}
+                          onChange={this.onChangeEvent}
+                          name="showDisplayName"
+                          color="primary"
+                        />
+                      }
+                      label="Show Display Name"
+                    />
+                  </FormControl>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <FormControl style={{ width: "100%" }}>
+                      <KeyboardDatePicker
+                        margin="normal"
+                        name="birthday"
+                        id="birthday"
+                        label="Birthday"
+                        format="MM/dd/yyyy"
+                        value={this.state.birthday}
+                        onChange={this.handleChangeBirthday}
+                        KeyboardButtonProps={{
+                          "aria-label": "change date",
+                        }}
+                      />
+                      <FormHelperText>It will only be used to find your next match...</FormHelperText>
+                    </FormControl>
+                  </MuiPickersUtilsProvider>
+                </Grid>
+
+                <Grid item xs={12} sm={6}>
+                  <FormControl style={{ width: "100%" }}>
+                    <InputLabel htmlFor="gender">Sex:</InputLabel>
+                    <NativeSelect
+                      value={this.state.gender}
+                      onChange={this.onChangeEvent}
+                      inputProps={{
+                        name: "gender",
+                        id: "gender",
+                      }}
+                    >
+                      <option aria-label="None" value="" />
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                    </NativeSelect>
+                    <FormHelperText>Please select your sex...</FormHelperText>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl style={{ width: "100%" }}>
+                    <FormControlLabel
+                      margin="normal"
+                      labelPlacement="start"
+                      control={
+                        <Switch
+                          checked={this.state.showGender}
+                          onChange={this.onChangeEvent}
+                          name="showGender"
+                          color="primary"
+                        />
+                      }
+                      label="Show Gender Info"
+                    />
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12}>
+                  <FormControl style={{ width: "100%" }}>
+                    <InputLabel htmlFor="aboutMe">About me:</InputLabel>
+                    <Input
+                      id="aboutMe"
+                      value={this.state.aboutMe ? this.state.aboutMe : ""}
+                      onChange={this.onChangeEvent}
+                      placeholder="Tell about yourself..."
+                      name="aboutMe"
+                    />
+                    <FormHelperText>
+                      Tell them about yourself. ex: Interest, hobbies, (it helps
+                      to identify you){" "}
+                    </FormHelperText>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl style={{ width: "100%" }}>
+                    <InputLabel htmlFor="interestedIn">
+                      InterestedIn:
+                    </InputLabel>
+                    <NativeSelect
+                      value={this.state.interestedIn}
+                      onChange={this.onChangeEvent}
+                      inputProps={{
+                        name: "interestedIn",
+                        id: "interestedIn",
+                      }}
+                    >
+                      {interestedInList.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </NativeSelect>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <FormControl style={{ width: "100%" }}>
+                    <Typography
+                      id="ageRange"
+                      style={{ marginLeft: "auto" }}
+                      gutterBottom
+                    >
+                      Age Range
+                    </Typography>
+                    <Slider min={16}
+                      name="ageRange" defaultValue={[16,35]}
+                      value={this.state.ageRange}
+                      onChange={this.handleChangeRange}
+                      aria-labelledby="ageRange"
+                      id="ageRange"
+                      valueLabelDisplay="on"
+                    />
+                  </FormControl>
+                </Grid>
+              </Grid>
+              <div className="group-buttons">
+                <Button variant="contained" onClick={this.goToDashboard}>
+                  Go Back
+                </Button>
+                <Button
+                  variant="contained"
+                  onClick={this.uploadAvatar}
+                  color="secondary"
+                  style={{ marginLeft: "10px" }}
+                >
+                  Update
+                </Button>
+              </div>
+            </div>
+          </Container>
         </div>
       </>
     );
   }
 }
+export default (Profile);

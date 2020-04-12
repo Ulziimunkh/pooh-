@@ -1,0 +1,86 @@
+.message-row {
+    display: -ms-grid;
+    display: grid;
+    -ms-grid-columns: 70%;
+        grid-template-columns: 70%;
+    /* margin-bottom: 10px; */
+}
+
+.message-row > .message-content {
+    display: -ms-grid;
+    display: grid;
+}
+
+.message-row > .message-content > .profile-img {
+    border-radius: 100%;
+    grid-row: span 2;
+    width: 24px;
+    height: 24px;
+    object-fit: cover;
+    align-self: center;
+}
+
+.message-row > .message-content > .message-time {
+    font-size: 0.6rem;
+    color: #777777;
+    margin-bottom: 10px;
+}
+
+.message-row > .message-content > .message-text {
+    padding: 9px 14px;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+    word-break: break-all;
+  }
+  
+  .message-row.you-message {
+    -webkit-box-pack: end;
+        -ms-flex-pack: end;
+            justify-content: end;
+  }
+  
+  .message-row.you-message > .message-content {
+    justify-items: end;
+  }
+  
+  .message-row.you-message > .message-content > .message-text {
+    background: #3578e5;
+    color: #FFF;
+    border: 1px solid #3578e5;
+    border-radius: 14px 14px 0 14px;
+  }
+  
+  .message-row.other-message {
+    justify-items: start;
+  }
+  
+  .message-row.other-message > .message-content {
+    -ms-grid-columns: auto auto;
+        grid-template-columns: auto auto;
+    grid-column-gap: 10px;
+  }
+  
+  .message-row.other-message > .message-content > .message-text {
+    background: #e8e8e8;
+    color: #203152;
+    border: 1px solid #cccccc;
+    border-radius: 14px 14px 14px 0;
+  }
+  /* Item image */
+
+.imgItemRight {
+  object-fit: cover;
+  width: 150px;
+  height: 150px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 0px;
+}
+@media only screen and (min-width: 768px){
+  .imgItemRight {
+    width: 300px;
+    height: 300px;
+  }
+}
+  /*# sourceMappingURL=msg.css.map */
