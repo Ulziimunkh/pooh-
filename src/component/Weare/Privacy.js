@@ -1,13 +1,13 @@
 import React from 'react';
 import NavBar from '../NavBar/NavBar';
 import './About.css'
- export default class Privacy extends React.Component {
+ export default class Aboutus extends React.Component {
   render() {
     return (
       <>
       <NavBar></NavBar>
       <div className="title">
-    <h2> Privacy</h2>
+    <h2> Coockie Policy</h2>
       </div>
       <div className="text">
     <h2>Introduction:</h2>
@@ -15,6 +15,7 @@ import './About.css'
 
 We appreciate that you put your trust in us when you provide us with your information and we do not take this lightly.</h3>
       </div>
+      {/* <Footer></Footer> */}
     </>)
     
   }
