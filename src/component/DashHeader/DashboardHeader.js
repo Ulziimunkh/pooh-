@@ -1,6 +1,5 @@
 import React from "react";
 import { myFirebase } from "../../Config/MyFirebase";
-import "./styles.css";
 import CustomDialog from "../Dialog/CustomDialog";
 import { AppString } from "../../Config/AppString";
 import AppBar from '@material-ui/core/AppBar';
@@ -11,7 +10,7 @@ import Typography from '@material-ui/core/Typography';
 import Badge from '@material-ui/core/Badge';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
-import MenuIcon from '@material-ui/icons/Menu';
+import MenuRoundedIcon from '@material-ui/icons/MenuRounded';
 import Avatar from "@material-ui/core/Avatar";
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
@@ -48,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Header(props) {
+export default function DashboardHeader(props) {
   const classes = useStyles();
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [isOpenDialogConfirmLogout, setIsOpenDialogConfirmLogout] = React.useState(false);
@@ -86,11 +85,14 @@ export default function Header(props) {
 
   const doLogout = () => {
     props.setLoading(true);
+    let uid = myFirebase.auth().currentUser.uid;
+    console.log("doLogout -> uid", uid)
     myFirebase
-      .auth()
-      .signOut()
-      .then(() => {
+    .auth()
+    .signOut()
+    .then(() => {
         props.setLoading(false);
+        props.statusChanged(uid);
         localStorage.clear();
         props.showToast(1, "Logout success");
         props.history.push("/");
@@ -178,7 +180,7 @@ export default function Header(props) {
             color="inherit"
             aria-label="open drawer"
           >
-            <MenuIcon />
+            <MenuRoundedIcon />
           </IconButton>
           <Typography className={classes.title} variant="h6" noWrap>
             MangoChat

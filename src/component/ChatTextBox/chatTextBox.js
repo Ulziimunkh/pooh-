@@ -5,8 +5,6 @@ import styles from "./styles";
 import { withStyles } from "@material-ui/core/styles";
 import images from "../Themes/Images";
 import {AppString} from "../../Config/AppString";
-import { myStorage, myFirestore, myFirebase } from "../../Config/MyFirebase";
-import moment from "moment";
 class ChatTextBoxComponent extends React.Component {
   constructor() {
     super();
@@ -37,30 +35,9 @@ class ChatTextBoxComponent extends React.Component {
 
   uploadPhoto = () => {
     if (this.currentPhotoFile) {
-      const timestamp = moment().valueOf().toString();
-
-      const uploadTask = myStorage
-        .ref()
-        .child("chatImages/")
-        .child(this.props.userId + '/')
-        .child(this.props.chatId + '/')
-        .child(timestamp)
-        .put(this.currentPhotoFile);
-
-      uploadTask.on(
-        AppString.UPLOAD_CHANGED,
-        null,
-        (err) => {
-          this.props.setLoading(false);
-          this.props.showToast(0, err.message);
-        },
-        () => {
-          uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-            this.props.setLoading(false);
-            this.submitMessage(downloadURL, 1);
-          });
-        }
-      );
+      var file = this.currentPhotoFile;
+      this.props.uploadPhotoFn(file);
+     // this.currentPhotoFile = null;
     } else {
       this.props.setLoading(false);
       this.props.showToast(0, "File is null");
@@ -125,7 +102,6 @@ class ChatTextBoxComponent extends React.Component {
             autoComplete="off"
             className={classes.viewInput}
             placeholder="Type your message.."
-            // value={this.state.chatText}
             onKeyUp={(e) => this.userTyping(e)}
             id="chattextbox"
             onFocus={this.userClickedInput}

@@ -1,44 +1,22 @@
-           
-    
-            
-        
-    .title{
-        color: #020202;
-            font-family: "proxima-nova", "Helvetica Neue", helvetica, sans-serif;
-            font-weight: 100;
-            font-size: 35px;
-            line-height: 35px;
-            margin: 64dp;
-    }
-    h2 {font-family: "proxima-nova", "Helvetica Neue", helvetica, sans-serif;
-        font-weight: 100;
-        color: black;
-      
-       
-    }
-    .text{
-        display: block;
-        max-width: 500px;
-        margin-block-start: 1em;
-        margin-block-end: 1em;
-        margin-inline-start: 0px;
-        margin-inline-end: 0px;
-        font-size: 18px;
+.title {
+  color: #020202;
+  font-weight: 100;
+  font-size: 35px;
+  line-height: 35px;
+}
+h2 {
+  font-weight: 100;
+  color: black;
+}
+.text {
+  font-size: 18px;
   text-align: justify;
-    margin-top: 50px;
-    margin-bottom: 100px;
-    margin-right: 150px;
-    margin-left: 300px;
-    color: #c4c0c0;
-    
-    font-family: "proxima-nova", "Helvetica Neue", helvetica, sans-serif;
-    font-weight: 100;
-    color: #c4c0c0;
-    font-size: 20px;
-    background-color: white;
-    line-height: 1.3em;
-  
-    }
-   
-   
- 
+  margin-top: 50px;
+  margin-bottom: 100px;
+  margin-right: 150px;
+  margin-left: 300px;
+  color: #c4c0c0;
+  font-weight: 100;
+  color: #c4c0c0;
+  line-height: 1.3em;
+}

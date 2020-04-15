@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import "react-toastify/dist/ReactToastify.css";
 import "./WelcomeBoard.css";
 import {AppString} from '../../Config/AppString';
-
 export default class WelcomeBoard extends Component {
     constructor(props) {
         super(props)

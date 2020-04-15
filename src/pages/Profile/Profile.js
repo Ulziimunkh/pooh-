@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { myStorage, myFirestore } from "../../Config/MyFirebase";
+import { myStorage, myFirestore, myFirebase } from "../../Config/MyFirebase";
 import { AppString } from "../../Config/AppString";
 import "./Profile.css";
 import images from "../../component/Themes/Images";
 import NativeSelect from "@material-ui/core/NativeSelect";
-import {CalculateAge} from '../../Utils/Utils'
+import { CalculateAge } from "../../Utils/Utils";
 import DateFnsUtils from "@date-io/date-fns";
 import {
   MuiPickersUtilsProvider,
@@ -24,7 +24,8 @@ import {
   Input,
   Switch,
 } from "@material-ui/core";
-import { Button} from "@material-ui/core";
+import { Button } from "@material-ui/core";
+import {downloadUserData} from '../../Context/Context'
 const interestedInList = [
   { value: "both", label: "Both" },
   { value: "male", label: "Male" },
@@ -35,20 +36,32 @@ class Profile extends Component {
   constructor(props) {
     super(props);
     // this.props.setLoading(false);
+    if (!localStorage.getItem(AppString.ID)) {
+      var uid = myFirebase.auth().currentUser.uid;
+      downloadUserData(uid);
+      this.props.setLoading(false);
+    }
     this.state = {
       id: localStorage.getItem(AppString.ID),
       displayName: localStorage.getItem(AppString.DISPLAYNAME),
       aboutMe: localStorage.getItem(AppString.ABOUT_ME),
       photoUrl: localStorage.getItem(AppString.PHOTO_URL),
-      interestedIn: localStorage.getItem(AppString.INTERESTEDIN)?? 'both',
-      showDisplayName: localStorage.getItem(AppString.SHOW_DISPLAYNAME) === 'true',
-      showProPhoto: Boolean(localStorage.getItem(AppString.SHOW_PROPHOTO)) === 'true',
-      showGender: Boolean(localStorage.getItem(AppString.SHOW_GENDER)) === 'true',
-      gender: localStorage.getItem(AppString.GENDER)?? '',
-      birthday: localStorage.getItem(AppString.BIRTHDAY)?? new Date('01/01/2004'),
-      ageRange: localStorage.getItem(AppString.AGE_RANGE).split(',').map(Number)
-      
+      interestedIn: localStorage.getItem(AppString.INTERESTEDIN) ?? "both",
+      showDisplayName:
+        localStorage.getItem(AppString.SHOW_DISPLAYNAME) === "true",
+      showProPhoto:
+        Boolean(localStorage.getItem(AppString.SHOW_PROPHOTO)) === "true",
+      showGender:
+        Boolean(localStorage.getItem(AppString.SHOW_GENDER)) === "true",
+      gender: localStorage.getItem(AppString.GENDER) ?? "",
+      birthday:
+        localStorage.getItem(AppString.BIRTHDAY) ?? new Date("01/01/2004"),
+      ageRange: localStorage
+        .getItem(AppString.AGE_RANGE)
+        .split(",")
+        .map(Number),
     };
+
     this.newAvatar = null;
     this.newPhotoUrl = "";
   }
@@ -133,9 +146,9 @@ class Profile extends Component {
       showProPhoto: this.state.showProPhoto,
       ageRange: this.state.ageRange,
     };
-    if(this.state.birthday){
-        let age = CalculateAge(new Date(this.state.birthday));
-        newInfo.age = age;
+    if (this.state.birthday) {
+      let age = CalculateAge(new Date(this.state.birthday));
+      newInfo.age = age;
     }
     if (isUpdatePhotoUrl) {
       newInfo.photoURL = downloadURL;
@@ -148,7 +161,10 @@ class Profile extends Component {
       .then((data) => {
         localStorage.setItem(AppString.DISPLAYNAME, this.state.displayName);
         localStorage.setItem(AppString.ABOUT_ME, this.state.aboutMe);
-        localStorage.setItem(AppString.SHOW_DISPLAYNAME, this.state.showDisplayName);
+        localStorage.setItem(
+          AppString.SHOW_DISPLAYNAME,
+          this.state.showDisplayName
+        );
         localStorage.setItem(AppString.GENDER, this.state.gender);
         localStorage.setItem(AppString.SHOW_GENDER, this.state.showGender);
         localStorage.setItem(AppString.BIRTHDAY, this.state.birthday);
@@ -267,7 +283,9 @@ class Profile extends Component {
                           "aria-label": "change date",
                         }}
                       />
-                      <FormHelperText>It will only be used to find your next match...</FormHelperText>
+                      <FormHelperText>
+                        It will only be used to find your next match...
+                      </FormHelperText>
                     </FormControl>
                   </MuiPickersUtilsProvider>
                 </Grid>
@@ -353,8 +371,10 @@ class Profile extends Component {
                     >
                       Age Range
                     </Typography>
-                    <Slider min={16}
-                      name="ageRange" defaultValue={[16,35]}
+                    <Slider
+                      min={16}
+                      name="ageRange"
+                      defaultValue={[16, 35]}
                       value={this.state.ageRange}
                       onChange={this.handleChangeRange}
                       aria-labelledby="ageRange"
@@ -384,4 +404,4 @@ class Profile extends Component {
     );
   }
 }
-export default (Profile);
+export default Profile;

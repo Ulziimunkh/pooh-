@@ -3,11 +3,10 @@ import styles from "./styles";
 import { withStyles } from "@material-ui/core/styles";
 import WelcomeBoard from "../WelcomeBoard/WelcomeBoard";
 import Avatar from '@material-ui/core/Avatar';
-import IconButton from '@material-ui/core/IconButton';
-import MoreIcon from '@material-ui/icons/MoreVert';
 import ChatLeave from './ChatLeave';
 import ChatMessage from './ChatMessage/ChatMessage'
 import moment from 'moment'
+import images from '../Themes/Images'
 class ChatViewComponent extends React.Component {
   componentDidMount = () => {
     const container = document.getElementById("chatview-container");
@@ -17,7 +16,42 @@ class ChatViewComponent extends React.Component {
     const container = document.getElementById("chatview-container");
     if (container) container.scrollTo(0, container.scrollHeight);
   };
-
+  messageList = (classes) =>{
+    if(this.props.chat.messages === undefined || this.props.chat.messages.length === 0){
+       return(
+        <div className={classes.viewWrapSayHi}>
+              <span className={classes.textSayHi}>Say hi to new friend</span>
+              <img onClick= {() => this.props.submitMessageFn("ic_wave_hand", 2)}
+                  className={classes.imgWaveHand}
+                  src={images.ic_wave_hand}
+                  alt="wave hand"
+              />
+          </div>
+    );
+    }
+    else{
+      return (
+        this.props.chat.messages.map((_msg, _index) => {
+          let showTimeStamp = false;
+          let chatTime = moment(_msg.timestamp);
+          if(moment().diff(chatTime, 'minutes') >= 5){
+            if(this.props.chat.messages.length-1 === _index){
+              if(_msg.sender !== this.props.userId)
+                  showTimeStamp = true;
+            } else{
+              if(_msg.sender !== this.props.chat.messages[_index +1].sender){
+                showTimeStamp = true;
+              }
+            }
+          }
+          return (
+            <ChatMessage key={_index} peerUser ={this.props.chat.peerUser} showTimeStamp ={showTimeStamp} message={_msg} isMyMessage={_msg.sender === this.props.userId}/>
+          );
+        })
+      )
+    }
+   
+  }
   render() {
     const { classes } = this.props;
     if (this.props.chat === undefined) {
@@ -41,33 +75,7 @@ class ChatViewComponent extends React.Component {
               </div>
           </div>
           <main id="chatview-container" className={classes.content}>
-            {this.props.chat.messages.map((_msg, _index) => {
-              let showTimeStamp = false;
-              let chatTime = moment(_msg.timestamp);
-              if(moment().diff(chatTime, 'minutes') >= 5){
-                if(this.props.chat.messages.length-1 === _index){
-                  if(_msg.sender !== this.props.userId)
-                      showTimeStamp = true;
-                } else{
-                  if(_msg.sender !== this.props.chat.messages[_index +1].sender){
-                    showTimeStamp = true;
-                  }
-                }
-              }
-              return (
-                <ChatMessage key={_index} peerUser ={this.props.chat.peerUser} showTimeStamp ={showTimeStamp} message={_msg} isMyMessage={_msg.sender === this.props.userId}/>
-                // <div
-                //   key={_index}
-                //   className={
-                //     _msg.sender === this.props.userId
-                //       ? classes.userSent
-                //       : classes.friendSent
-                //   }
-                // >
-                //   {_msg.message}
-                // </div>
-              );
-            })}
+            {this.messageList(classes)}
           </main>
         </div>
       );

@@ -3,6 +3,7 @@ import classNames from "classnames";
 import { ChatMessageTime } from "../../../Utils/Utils";
 import "./ChatMessage.css";
 import images from "../../Themes/Images";
+import LazyImages from './LazyImage'
 export default function ChatMessage(props) {
   const messageClass = classNames("message-row", {
     "you-message": props.isMyMessage,
@@ -16,11 +17,7 @@ export default function ChatMessage(props) {
       return <div className="message-text">{props.message.message}</div>;
     } else if (props.message.type === 1) {
       return (
-        <img
-        className="imgItemRight"
-        src={props.message.message}
-        alt="content img"
-    />
+        <LazyImages alt="content img" src={props.message.message} className="imgItemRight"/>
       )
     } else if (props.message.type === 2) {
       return (

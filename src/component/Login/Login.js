@@ -1,19 +1,17 @@
 import React, { Component } from "react";
 import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
-import {withRouter, Redirect} from 'react-router-dom'
+import { withRouter, Redirect } from "react-router-dom";
 import { myFirestore, myFirebase } from "../../Config/MyFirebase";
-import {CalculateAge} from '../../Utils/Utils'
-class Login extends Component
-{
+import { CalculateAge } from "../../Utils/Utils";
+class Login extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     // The component's Local state.
     this.state = {
       isSignedIn: false, // Local signed-in state.
-      signupError: ""
+      signupError: "",
     };
-}
-  
+  }
 
   uiConfig = {
     signInFlow: "popup",
@@ -25,7 +23,7 @@ class Login extends Component
           "public_profile",
           "email",
           "user_gender",
-          "user_birthday"
+          "user_birthday",
           //"user_hometown",
           //"user_location",
           //"user_photos",
@@ -35,7 +33,7 @@ class Login extends Component
           //"user_likes",
           //"instagram_basic",
           //"user_friends"
-        ]
+        ],
       },
       myFirebase.auth.GoogleAuthProvider.PROVIDER_ID,
       // {
@@ -43,11 +41,19 @@ class Login extends Component
       //   defaultCountry: "IN"
       // }
     ],
+    // Terms of service url.
+    tosUrl: "/term",
+    // Privacy policy url.
+    privacyPolicyUrl: "/privacy",
+    // credentialHelper:
+    //   CLIENT_ID && CLIENT_ID != "YOUR_OAUTH_CLIENT_ID"
+    //     ? myFirebase.auth.CredentialHelper.GOOGLE_YOLO
+    //     : myFirebase.auth.CredentialHelper.ACCOUNT_CHOOSER_COM,
     callbacks: {
       signInSuccessWithAuthResult: (authResult, redirectUrl) => {
         console.log("login result:", authResult);
         if (authResult.credential) {
-          const dt = new Date();
+          const dt = Date.now();
           const { user, additionalUserInfo } = authResult;
           const userObj = {
             id: user.uid,
@@ -57,13 +63,13 @@ class Login extends Component
             emailVerified: false,
             aboutMe: "Let's have fun.",
             providerId: authResult.additionalUserInfo.providerId,
-            ageRange: [16, 35],
+            ageRange: [16,35],
             interestedIn: "both",
             showDisplayName: false,
             showGender: false,
             showProPhoto: false,
             createdDate: dt,
-            lastSignedDate: dt
+            last_changed: dt,
           };
           switch (authResult.additionalUserInfo.providerId) {
             case "facebook.com":
@@ -74,6 +80,12 @@ class Login extends Component
               }
               break;
             case "google.com":
+              if(user.photoURL){
+                if ((user.photoURL.indexOf('googleusercontent.com') !== -1) ||
+                    (user.photoURL.indexOf('ggpht.com') !== -1)) {
+                      userObj.photoURL = user.photoURL + '?sz=40px';
+                }
+              }
               if (additionalUserInfo.isNewUser) {
               } else {
               }
@@ -87,9 +99,9 @@ class Login extends Component
               break;
           }
           if (additionalUserInfo.isNewUser) {
-            if(userObj.birthday){
-                let age = CalculateAge(new Date(this.state.birthday));
-                userObj.age = age;
+            if (userObj.birthday) {
+              let age = CalculateAge(new Date(userObj.birthday));
+              userObj.age = age;
             }
             myFirestore
               .collection("users")
@@ -98,36 +110,21 @@ class Login extends Component
               .then(
                 () => {
                   console.log("registered successfully...");
+                  this.props.history.push("/profile");
                 },
-                dbErr => {
+                (dbErr) => {
                   this.setState({ signupError: "Failed to add user" });
                 }
               );
-          } else {
-            myFirestore
-              .collection("users")
-              .doc(user.uid)
-              .update({ lastSignedDate: new Date() })
-              .then(
-                (userUpdated) => {
-                 
-                },
-                dbErr => {
-                  console.log(
-                    "Failed to update user data to the database: ",
-                    dbErr
-                  );
-                  this.setState({ signupError: "Failed to update user" });
-                }
-              );
-            //update
-          }
+          } 
+          console.log("Login -> statusChanged")
+         this.props.statusChanged(user.uid);
         }
         return false;
       },
       // signInFailure callback must be provided to handle merge conflicts which
       // occur when an existing credential is linked to an anonymous user.
-      signInFailure: function(error) {
+      signInFailure: function (error) {
         console.log("login failure----->");
         // For merge conflicts, the error.code will be
         // 'firebaseui/anonymous-upgrade-merge-conflict'.
@@ -141,38 +138,40 @@ class Login extends Component
         // ...
         // Finish sign-in after data is copied.
         return myFirebase.auth().signInWithCredential(cred);
-      }
-    }
+      },
+    },
   };
 
   // Listen to the Firebase Auth state and set the local state.
   componentDidMount() {
     this.unregisterAuthObserver = myFirebase
       .auth()
-      .onAuthStateChanged(user => this.setState({ isSignedIn: !!user }));
+      .onAuthStateChanged((user) => this.setState({ isSignedIn: !!user }));
   }
   // Make sure we un-register Firebase observers when the component unmounts.
   componentWillUnmount() {
     this.unregisterAuthObserver();
   }
+
   render() {
     if (!this.state.isSignedIn) {
-    return (
-      <>
-        <div className="home-login">
-          <div className="login-content">
-            <h1>Welcome to Mango!</h1>
-            <p>Please sign-in:</p>
-            <StyledFirebaseAuth 
-              uiConfig={this.uiConfig}
-              firebaseAuth={myFirebase.auth()}
-            />
+      return (
+        <>
+          <div className="home-login">
+            <div className="login-content">
+              <h1>Welcome to Mango!</h1>
+              <p>Please sign-in:</p>
+              <StyledFirebaseAuth
+                uiConfig={this.uiConfig}
+                firebaseAuth={myFirebase.auth()}
+              />
+            </div>
           </div>
-        </div>
-      </>
-    );
+        </>
+      );
     }
+    // this.props.statusChanged();
     return <Redirect to={{ pathname: "/dashboard" }}></Redirect>;
   }
 }
-export default withRouter(Login)
+export default withRouter(Login);

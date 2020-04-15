@@ -1,5 +1,4 @@
 import React from "react";
-import NewChatComponent from "../NewChat/newChat";
 import ChatListComponent from "../ChatList/ChatList";
 import ChatViewComponent from "../ChatView/chatView";
 import ChatTextBoxComponent from "../ChatTextBox/chatTextBox";
@@ -7,9 +6,8 @@ import "./styles.css";
 import { withStyles } from "@material-ui/core";
 import "react-toastify/dist/ReactToastify.css";
 import { AppString } from "../../Config/AppString";
-import { myFirestore, myFirebase } from "../../Config/MyFirebase";
-import Header from "../DashHeader/Header";
-import moment from 'moment';
+import { myFirestore, myFirebase, myStorage } from "../../Config/MyFirebase";
+import DashboardHeader from "../DashHeader/DashboardHeader";
 
 // I need to investigate why sometimes
 // two messages will send instead of just
@@ -45,6 +43,29 @@ class DashboardComponent extends React.Component {
     };
     this.props.setLoading(true);
   }
+   async componentDidMount(){
+    console.log("Login -> statusChanged")
+    this.props.setLoading(true);
+    await myFirebase.auth().onAuthStateChanged(async (_usr) => {
+      if (!_usr) this.props.history.push("/");
+      else {
+        // GET Profile data
+        if (!localStorage.getItem(AppString.ID)) {
+          //myFirebase.auth().signOut();
+          await this.downloadUserData(_usr.uid);
+          //this.props.showToast(1, 'Login success')
+        }
+        // Get Chat List ###########################
+        this.downloadUserChatList(_usr.uid);
+      }
+      // this.props.setLoading(false);
+      this.props.setLoading(false);
+    });
+    // this.props.statusChanged(localStorage.getItem(AppString.ID));
+   }
+   componentWillUnmount(){
+    // this.props.statusChanged(localStorage.getItem(AppString.ID));
+   }
   toggleSideMenu = () => {
     if (this.state.isSideBarIsOpen) {
       this.setState({ isSideBarIsOpen: false });
@@ -57,12 +78,13 @@ class DashboardComponent extends React.Component {
     if (this.state.userId) {
       return (
         <div className="dashboard-container" id="dashboard-container">
-          <Header
+          <DashboardHeader  statusChanged = {this.props.statusChanged} 
+            userId={this.state.userId}
             toggleSideBar={this.toggleSideMenu}
             setLoading={this.props.setLoading}
             showToast={this.props.showToast}
             {...this.props}
-          ></Header>
+          ></DashboardHeader>
           <div className="dashboard-content">
             <div
               className={
@@ -90,6 +112,7 @@ class DashboardComponent extends React.Component {
               {this.state.newChatFormVisible ? null : (
                 <div className="chatView-container">
                   <ChatViewComponent
+                    submitMessageFn={this.submitMessage}
                     userId={this.state.userId}
                     setLoading={this.props.setLoading}
                     chat={this.state.chats[this.state.selectedChat]}
@@ -99,9 +122,10 @@ class DashboardComponent extends React.Component {
               {this.state.selectedChat !== null &&
               !this.state.newChatFormVisible ? (
                 <div className="chatText-container">
-                  <ChatTextBoxComponent   userId={this.state.userId} 
-                   setLoading={this.props.setLoading}
-                   chatId={this.state.chats[this.state.selectedChat].chatId}
+                  <ChatTextBoxComponent
+                    uploadPhotoFn={this.uploadPhoto}
+                    userId={this.state.userId}
+                    setLoading={this.props.setLoading}
                     userClickedInputFn={this.messageRead}
                     submitMessageFn={this.submitMessage}
                   ></ChatTextBoxComponent>
@@ -134,11 +158,40 @@ class DashboardComponent extends React.Component {
         receiverHasRead: false,
       });
   };
+  uploadPhoto = async (currentPhotoFile) => {
+    const timestamp = Date.now().toString();
+    let chatId = this.state.chats[this.state.selectedChat].chatId;
+    console.log(
+      "DashboardComponent -> uploadPhoto -> this.state.userId",
+      this.state.userId
+    );
+    const uploadTask = myStorage
+      .ref()
+      .child("chatImages/")
+      .child(this.state.userId + "/")
+      .child(chatId + "/")
+      .child(timestamp)
+      .put(currentPhotoFile);
+
+    uploadTask.on(
+      AppString.UPLOAD_CHANGED,
+      null,
+      (err) => {
+        this.props.setLoading(false);
+        this.props.showToast(0, err.message);
+      },
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then(async (downloadURL) => {
+          this.props.setLoading(false);
+          await this.submitMessage(downloadURL, 1);
+        });
+      }
+    );
+  };
 
   newChatBtnClicked = () => this.newChatSubmit();
 
   newChatSubmit = async (chatObj) => {
-    console.log("email", this.state.userId);
     if (this.state.chats.length < 3) {
       await myFirestore
         .collection("users")
@@ -152,7 +205,6 @@ class DashboardComponent extends React.Component {
             friends: friends,
           });
           if (this.state.friends.length > 0) {
-            console.log("friends", this.state.friends);
             var winner = this.state.friends[
               this.random(0, this.state.friends.length)
             ];
@@ -165,33 +217,34 @@ class DashboardComponent extends React.Component {
                 .set({
                   chatName: "Room-" + tempId,
                   messages: [
-                    {
-                      message:
-                        "Welcome to Mango chat!. Your chat has started. Enjoy!",
-                      sender: this.state.userId,
-                      type: 0,
-                      timestamp: tempId,
-                    },
+                    // {
+                    //   message:
+                    //     "Welcome to Mango chat!. Your chat has started. Enjoy!",
+                    //   sender: this.state.userId,
+                    //   type: 0,
+                    //   timestamp: tempId,
+                    // },
                   ],
                   hostId: this.state.userId,
                   hostAlias: "User-" + tempUserId,
                   clientId: winner.id,
                   clientAlias: "User-" + tempUserId,
                   users: [this.state.userId, winner.id],
-                  receiverHasRead: false,
+                  receiverHasRead: true,
                   isActive: true,
                   createdDate: new Date(),
                 })
                 .then(async (r) => {
                   await this.selectChat(this.state.chats.length - 1);
                 })
-                .catch((e) => {
-                  console.log("error add chat", e);
-                });
+                .catch((e) => {});
             } else {
               alert("Sorry! We are not able to create chat. duplicate_user");
             }
-          }
+          } else
+            alert(
+              "Sorry! This time we are not able to create chat. Please try again later. Thank you for understanding."
+            );
         });
     } else {
       alert("Sorry, Your chat limit has reached.");
@@ -200,7 +253,6 @@ class DashboardComponent extends React.Component {
   };
 
   selectChat = async (chatIndex) => {
-    console.log("chatIndex:", chatIndex);
     this.toggleSideMenu();
     if (this.state.chats.length > 0 && chatIndex >= 0) {
       await this.setState({
@@ -230,91 +282,111 @@ class DashboardComponent extends React.Component {
         .doc(docKey)
         .update({ receiverHasRead: true });
     } else {
-      console.log("Clicked message where the user was the sender");
     }
   };
 
   clickedMessageWhereNotSender = (chatIndex) =>
+    this.state.chats[chatIndex].messages.length > 0 &&
     this.state.chats[chatIndex].messages[
       this.state.chats[chatIndex].messages.length - 1
     ].sender !== this.state.userId;
-
-  getUserById = (uid) => {
-    const result = myFirestore
-      .collection("users")
-      .where(AppString.ID, "==", uid)
-      .get();
-    return result;
-  };
-  downloadUserData = async (uid) => {
-    const result = await this.getUserById(uid);
-    // console.log("DashboardComponent -> downloadUserData -> result", result)
-    if (result.docs.length > 0) {
-      // Write user info to local
-      const userExist = result.docs[0].data();
-      this.setState({ currentUser: userExist });
-      localStorage.setItem(AppString.ID, uid);
-      localStorage.setItem(AppString.DISPLAYNAME, userExist.displayName);
-      localStorage.setItem(AppString.PHOTO_URL, userExist.photoURL);
-      localStorage.setItem(AppString.ABOUT_ME, userExist.aboutMe);
-      localStorage.setItem(AppString.GENDER, userExist.gender);
-      localStorage.setItem(AppString.BIRTHDAY, userExist.birthday);
-      localStorage.setItem(
-        AppString.SHOW_DISPLAYNAME,
-        userExist.showDisplayName
-      );
-      localStorage.setItem(AppString.SHOW_PROPHOTO, userExist.showProPhoto);
-      localStorage.setItem(AppString.SHOW_GENDER, userExist.showGender);
-      localStorage.setItem(AppString.INTERESTEDIN, userExist.interestedIn);
-      localStorage.setItem(AppString.AGE_RANGE, userExist.ageRange);
-    }
-  };
-  downloadUserChatList = async (uid) => {
-    
-    myFirestore
-      .collection("chats")
-      .where("isActive", "==", true)
-      .where("users", "array-contains", uid)
-      .onSnapshot(async (res) => {
-        var chats = [];
-        res.docs.forEach(async (_doc) => {
-          var peerId = await _doc.data().users.filter((ids) => ids !== uid)[0];
-          let peerUser = await this.getUserById(peerId);
-          chats.push({
-            ..._doc.data(),
-            chatId: _doc.id,
-            peerUser: peerUser.docs[0].data(),
-          });
-          this.props.setLoading(false);
-
-          console.log(
-            "DashboardComponent -> downloadUserChatList -> chats",
-            chats
-          );
-          await this.setState({
-            userId: uid,
-            chats: chats,
-            friends: [],
-          });
-        });
-      });
-  };
-  componentWillMount = () => {
-    document.getElementsByTagName("BODY")[0].classList.remove("home-page");
-    this.props.setLoading(true);
-    myFirebase.auth().onAuthStateChanged(async (_usr) => {
-      if (!_usr) this.props.history.push("/");
-      else {
-        // GET Profile data
-        if (!localStorage.getItem(AppString.ID)) {
-          this.downloadUserData(_usr.uid);
-          //this.props.showToast(1, 'Login success')
+  getUserById = async (uid) => {
+    await new Promise((r) => {
+      let ref = myFirestore.collection("users").doc(uid);
+      ref.get().then((snapshot) => {
+        //DocSnapshot
+        if (snapshot.exists) {
+          r(snapshot.data());
+          //return snapshot.data();
+        } else {
+          // snapshot.data() will be undefined in this case
+          //return null;
         }
-        // Get Chat List ###########################
-        this.downloadUserChatList(_usr.uid);
+      });
+    });
+  };
+
+  downloadUserData = async (uid) => {
+    let ref = await myFirestore.collection("users").doc(uid);
+    ref.get().then((snapshot) => {
+      //DocSnapshot
+      if (snapshot.exists) {
+        const userExist = snapshot.data();
+        localStorage.setItem(AppString.ID, uid);
+        localStorage.setItem(AppString.DISPLAYNAME, userExist.displayName);
+        localStorage.setItem(AppString.PHOTO_URL, userExist.photoURL);
+        localStorage.setItem(AppString.ABOUT_ME, userExist.aboutMe);
+        localStorage.setItem(AppString.GENDER, userExist.gender);
+        localStorage.setItem(AppString.BIRTHDAY, userExist.birthday);
+        localStorage.setItem(
+          AppString.SHOW_DISPLAYNAME,
+          userExist.showDisplayName
+        );
+        localStorage.setItem(AppString.SHOW_PROPHOTO, userExist.showProPhoto);
+        localStorage.setItem(AppString.SHOW_GENDER, userExist.showGender);
+        localStorage.setItem(AppString.INTERESTEDIN, userExist.interestedIn);
+        localStorage.setItem(AppString.AGE_RANGE, userExist.ageRange);
       }
     });
   };
+  downloadUserChatList = async (uid) => {
+    try {
+      var listChat = [];
+      var chats = [];
+      myFirestore
+        .collection("chats")
+        .where("isActive", "==", true)
+        .where("users", "array-contains", uid)
+        .onSnapshot(async (res) => {
+          listChat = res.docs;
+          if (listChat.length > 0) {
+            await new Promise((gf) => {
+              chats = [];
+              listChat.forEach(async (_doc, index) => {
+                var peerId = _doc.data().users.filter((ids) => ids !== uid)[0];
+
+                await new Promise((resolve, reject) => {
+                  let ref = myFirestore.collection("users").doc(peerId);
+                  ref.get().then((snapshot) => {
+                    //DocSnapshot
+                    if (snapshot.exists) {
+                      resolve(snapshot.data());
+                    } else {
+                      // snapshot.data() will be undefined in this case
+                      resolve();
+                    }
+                  });
+                }).then((values) => {
+                  let peerUser = values;
+                  chats.push({
+                    ..._doc.data(),
+                    chatId: _doc.id,
+                    peerUser: peerUser,
+                  });
+                });
+                if (index === listChat.length - 1) gf();
+              });
+            }).then((e) => {
+              this.setState({
+                userId: uid,
+                chats: chats,
+              });
+            });
+          }
+        });
+      await this.setState({
+        userId: uid,
+        chats: chats,
+      });
+    } catch (e) {
+      console.error("Problem", e);
+    }
+  };
+
+  UNSAFE_componentWillMount() {
+   
+  }
+
   random = (mn, mx) => {
     var num = Math.round(Math.random() * (mx - mn) + mn) - 1;
     return num < 0 ? 0 : num;

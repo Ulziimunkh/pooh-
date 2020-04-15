@@ -6,6 +6,7 @@ const styles = (theme) => ({
   },
   listItem: {
     cursor: "pointer",
+    position:'relative'
   },
   newChatBtn: {
     borderRadius: "0px",
@@ -16,6 +17,18 @@ const styles = (theme) => ({
     top: "0",
     right: "5px",
   },
+  statusContainer:{
+    position: 'absolute',
+    bottom: '19px',
+    left: '45px'
+  },
+  status:{
+    background: 'rgb(66, 183, 42)',
+    borderRadius: '50%',
+    border:'2px solid #fff',
+    height: '14px',
+    width: '14px',
+  }
 });
 
 export default styles;

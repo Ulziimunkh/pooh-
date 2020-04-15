@@ -8,7 +8,7 @@ export default class Home extends Component {
       <>
         <div className="home-page">
           <NavBar></NavBar>
-          <Login
+          <Login statusChanged={this.props.statusChanged}
             setLoading={this.props.setLoading}
             showToast={this.props.showToast}
           />

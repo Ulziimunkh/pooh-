@@ -72,7 +72,26 @@ const styles = theme => ({
     position: 'absolute',
     right: '10px',
     color:'rgba(0, 0, 0, 0.54)'
-  }
+  },
+
+/* Say hi */
+
+viewWrapSayHi: {
+  marginTop: '20px',
+  display: 'flex',
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center'
+},
+textSayHi: {
+  color: '#808888',
+  fontSize: '14px'
+},
+imgWaveHand: {
+  width: '40px',
+  height: '40px',
+  marginLeft: '10px'
+}
 
 });
 
