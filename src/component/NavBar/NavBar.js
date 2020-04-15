@@ -5,7 +5,7 @@ import classNames from "classnames";
 import { NavLink, withRouter } from "react-router-dom";
 import MenuRoundedIcon from "@material-ui/icons/MenuRounded";
 import IconButton from '@material-ui/core/IconButton';
-
+import CloseIcon from '@material-ui/icons/Close';
 class NavBar extends Component {
   constructor(props) {
     super(props);
@@ -19,10 +19,7 @@ class NavBar extends Component {
     this.setState({ isDropped: !this.state.isDropped });
   };
   componentDidMount() {
-    console.log(
-      "NavBar -> componentWillMount -> this.props.location.pathname ",
-      this.props.location.pathname
-    );
+    this.setState({isHome: this.props.location.pathname === '/'})
   }
   render() {
     let className = classNames({ header: true, home: this.state.isHome, 'responsive': this.state.isDropped });
@@ -38,20 +35,35 @@ class NavBar extends Component {
             color="inherit"
             aria-label="open drawer"
           >
-            <MenuRoundedIcon />
+              <CloseIcon style={{display: this.state.isDropped ? 'block': 'none'}}/>
+            <MenuRoundedIcon style={{display: this.state.isDropped ? 'none': 'block'}} />
           </IconButton>
-            <NavLink className="menu" to="/privacy" activeClassName="active">
-              Privacy
-            </NavLink>
-            <NavLink className="menu" to="/term" activeClassName="active">
-              Term
-            </NavLink>
-            <NavLink className="menu" exact activeClassName="active" to="/aboutus">
+          <ul className="main-nav" >
+              <li>
+                <NavLink className="menu" exact activeClassName="active" to="/">
+                Home
+                </NavLink>
+              </li>
+              <li>
+              <NavLink className="menu" exact activeClassName="active" to="/aboutus">
               About
             </NavLink>
-            <NavLink className="menu" exact activeClassName="active" to="/">
-              Home
+              </li>
+              <li>
+              <NavLink className="menu" to="/term" activeClassName="active">
+              Term
             </NavLink>
+              </li>
+              <li>
+              <NavLink className="menu" to="/privacy" activeClassName="active">
+              Privacy
+            </NavLink>
+              </li>
+              </ul>
+            
+           
+           
+          
         </nav>
     );
   }

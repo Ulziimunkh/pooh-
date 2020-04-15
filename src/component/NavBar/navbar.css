@@ -25,9 +25,14 @@
 .header .menuButton {
   display: none;
 }
+.main-nav {
+  list-style-type: none;
+  display: flex;
+  justify-content: flex-end;
+}
 
 .header a.menu {
-  float: right;
+  float: left;
   display: block;
   color: #f2f2f2;
   text-align: center;
@@ -62,6 +67,9 @@
   .header .menuButton {
     display: block;
     float: right;
+  }
+  .main-nav {
+    display: block;
   }
   .header a.menu{
     float: none;
