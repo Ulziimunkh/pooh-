@@ -59,20 +59,20 @@ export default function Term() {
             </h3>
             <p className={classes.para}>
               You must be of legal age to enter into binding agreements (such as
-              this), meaning you must be at least 16 years of age (18 or 21 in some
-              jurisdictions). This Site may contain images, language and sounds
-              that are sexually erotic in nature. By accessing or using this
-              Service, You represent and warrant that you are not offended by
-              images of nudity, sexually charged language, and that You choose
-              to be exposed to same herein. If you have a person under the age
-              of majority in your household or who might otherwise gain access
-              to this Site via your computer, the Company strongly encourages
-              you to install filtering software to prevent access to this Site
-              by a minor or a person who may be offended by its content. You
-              represent and warrant that you will not allow a minor access to
-              this Site. In accordance with 47 U.S.C. §230(d), You are hereby
-              informed that You may research online safety filters at websites
-              such as: http://www.getnetwise.org or
+              this), meaning you must be at least 16 years of age (18 or 21 in
+              some jurisdictions). This Site may contain images, language and
+              sounds that are sexually erotic in nature. By accessing or using
+              this Service, You represent and warrant that you are not offended
+              by images of nudity, sexually charged language, and that You
+              choose to be exposed to same herein. If you have a person under
+              the age of majority in your household or who might otherwise gain
+              access to this Site via your computer, the Company strongly
+              encourages you to install filtering software to prevent access to
+              this Site by a minor or a person who may be offended by its
+              content. You represent and warrant that you will not allow a minor
+              access to this Site. In accordance with 47 U.S.C. §230(d), You are
+              hereby informed that You may research online safety filters at
+              websites such as: http://www.getnetwise.org or
               http://www.child-internet-safety.com/internet_filters.php, among
               others. We do not make any warranty or representation regarding
               these products so We highly recommend You conduct responsible due
@@ -85,12 +85,34 @@ export default function Term() {
               subscription.
             </p>
             <h3 className={classes.subTitle}>
-            2.MEMBER INTERACTIONS / SAFETY / RELEASE 
+              2.MEMBER INTERACTIONS / SAFETY / RELEASE
             </h3>
             <p className={classes.para}>
-            By accessing or using the Service, You represent and warrant that you are not required to register as a sex offender with any government entity. THIS SERVICE DOES NOT CONDUCT CRIMINAL BACKGROUND SCREENINGS ON ITS MEMBERS. You agree that You are solely responsible for Your interactions with other users, both on and off the Site. Use common sense and caution when interacting with other users of the Service. You are strongly encouraged to request proof of age and identity prior to embarking on a relationship or outing with another user or member. Company does not guarantee the authenticity of any member profile. You release the Company, its managers, officers, directors, employees and agents from all claims, liabilities and demands, of any kind or nature whatsoever, known or unknown, suspected or unsuspected, arising out of or related to Your use of the Service or Your interactions with any person or profile through, at or in connection with the Site, including but not limited to interactions with Fantasy Dates.
-
-Under no circumstance will Company be liable for any damages whatsoever, whether direct, indirect, general, special, compensatory, consequential, and/or incidental, arising out of or relating to the conduct of You or anyone else in connection with the use of the Service including, but not limited to, bodily injury, emotional distress, and/or any other damages resulting from communications or meetings with other users, members or profiles, including but not limited to Fantasy Dates.
+              By accessing or using the Service, You represent and warrant that
+              you are not required to register as a sex offender with any
+              government entity. THIS SERVICE DOES NOT CONDUCT CRIMINAL
+              BACKGROUND SCREENINGS ON ITS MEMBERS. You agree that You are
+              solely responsible for Your interactions with other users, both on
+              and off the Site. Use common sense and caution when interacting
+              with other users of the Service. You are strongly encouraged to
+              request proof of age and identity prior to embarking on a
+              relationship or outing with another user or member. Company does
+              not guarantee the authenticity of any member profile. You release
+              the Company, its managers, officers, directors, employees and
+              agents from all claims, liabilities and demands, of any kind or
+              nature whatsoever, known or unknown, suspected or unsuspected,
+              arising out of or related to Your use of the Service or Your
+              interactions with any person or profile through, at or in
+              connection with the Site, including but not limited to
+              interactions with Fantasy Dates. Under no circumstance will
+              Company be liable for any damages whatsoever, whether direct,
+              indirect, general, special, compensatory, consequential, and/or
+              incidental, arising out of or relating to the conduct of You or
+              anyone else in connection with the use of the Service including,
+              but not limited to, bodily injury, emotional distress, and/or any
+              other damages resulting from communications or meetings with other
+              users, members or profiles, including but not limited to Fantasy
+              Dates.
             </p>
           </article>
         </Paper>

@@ -98,7 +98,7 @@ class ChatTextBoxComponent extends React.Component {
             alt="icon open sticker"
             onClick={this.openListSticker}
           />
-          <TextField
+          <TextField autoFocus="true" multiline="true"  rowsMax="4"
             autoComplete="off"
             className={classes.viewInput}
             placeholder="Type your message.."
@@ -125,9 +125,12 @@ class ChatTextBoxComponent extends React.Component {
     if (this.state.isShowSticker && type === 2) {
       this.setState({ isShowSticker: false });
     }
-    if (this.messageValid(content)) {
+    if (this.messageValid(content) || ((type=== 0) && String(content).length < 500)) {
       this.props.submitMessageFn(content, type);
       if (type === 0) document.getElementById("chattextbox").value = "";
+    }else
+    {
+      alert("We can't able to send your message. Please check it may too long.");
     }
   };
 }

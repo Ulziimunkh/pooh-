@@ -15,7 +15,6 @@ import Avatar from "@material-ui/core/Avatar";
 import NotificationsIcon from '@material-ui/icons/Notifications';
 import MoreIcon from '@material-ui/icons/MoreVert';
 
-
 const useStyles = makeStyles((theme) => ({
   grow: {
     flexGrow: 1,

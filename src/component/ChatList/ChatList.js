@@ -31,7 +31,7 @@ class ChatListComponent extends React.Component {
       return (
         (this.userIsSender(_chat) ? "You: " : "") +
         (_chat.messages[_chat.messages.length - 1].type === 0
-          ? _chat.messages[_chat.messages.length - 1].message.substring(0, 30) +
+          ? _chat.messages[_chat.messages.length - 1].message.substring(0, 15) +
             (_chat.messages[_chat.messages.length - 1].message.length > 10
               ? " ..."
               : ".")
