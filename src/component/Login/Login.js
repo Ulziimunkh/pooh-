@@ -166,10 +166,10 @@ class Login extends Component {
         <>
           <div className="home-login">
             <div className="login-content">
-            <button onClick={this.requestPermission}>
+            {/* <button onClick={this.requestPermission}>
               {" "}
               request permission
-            </button>
+            </button> */}
               <h1>Welcome to Mango!</h1>
               <p>Please sign-in:</p>
               <StyledFirebaseAuth
