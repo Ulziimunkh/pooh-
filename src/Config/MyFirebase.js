@@ -1,4 +1,5 @@
 import firebase from 'firebase'
+// import * as admin from "firebase-admin";
 
 const config = {
     apiKey: "AIzaSyB0cWWECSVpxwusX-Gltp_181PWv6oHKf8",
@@ -13,6 +14,14 @@ const config = {
 firebase.initializeApp(config)
 firebase.firestore();
 
+// var serviceAccount = require("./pooh-882bf-firebase-adminsdk-jofgx-a0a58d8ef3.json");
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//   databaseURL: "https://pooh-882bf.firebaseio.com"
+// });
+
+// export const myAdmin = admin
 export const myFirebase = firebase
 export const myFirestore = firebase.firestore()
 export const myStorage = firebase.storage()

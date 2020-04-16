@@ -1,5 +1,5 @@
 {
-  "name": "dateme",
+  "name": "mangochat",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^7.2.1",
     "date-fns": "^2.11.1",
     "firebase": "^7.13.1",
+    "firebase-admin": "^8.10.0",
     "firebase-functions": "^3.6.0",
     "i18next": "^19.3.4",
     "moment": "^2.24.0",

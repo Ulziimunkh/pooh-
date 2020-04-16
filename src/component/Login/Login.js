@@ -63,7 +63,7 @@ class Login extends Component {
             emailVerified: false,
             aboutMe: "Let's have fun.",
             providerId: authResult.additionalUserInfo.providerId,
-            ageRange: [16,35],
+            ageRange: [16, 35],
             interestedIn: "both",
             showDisplayName: false,
             showGender: false,
@@ -80,10 +80,12 @@ class Login extends Component {
               }
               break;
             case "google.com":
-              if(user.photoURL){
-                if ((user.photoURL.indexOf('googleusercontent.com') !== -1) ||
-                    (user.photoURL.indexOf('ggpht.com') !== -1)) {
-                      userObj.photoURL = user.photoURL + '?sz=40px';
+              if (user.photoURL) {
+                if (
+                  user.photoURL.indexOf("googleusercontent.com") !== -1 ||
+                  user.photoURL.indexOf("ggpht.com") !== -1
+                ) {
+                  userObj.photoURL = user.photoURL + "?sz=40px";
                 }
               }
               if (additionalUserInfo.isNewUser) {
@@ -116,9 +118,9 @@ class Login extends Component {
                   this.setState({ signupError: "Failed to add user" });
                 }
               );
-          } 
-          console.log("Login -> statusChanged")
-         this.props.statusChanged(user.uid);
+          }
+          console.log("Login -> statusChanged");
+          this.props.statusChanged(user.uid);
         }
         return false;
       },
@@ -152,13 +154,22 @@ class Login extends Component {
   componentWillUnmount() {
     this.unregisterAuthObserver();
   }
+  requestPermission = () => {
+    Notification.requestPermission().then(function(result) {
+      console.log(result);
+    });
 
+  };
   render() {
     if (!this.state.isSignedIn) {
       return (
         <>
           <div className="home-login">
             <div className="login-content">
+            <button onClick={this.requestPermission}>
+              {" "}
+              request permission
+            </button>
               <h1>Welcome to Mango!</h1>
               <p>Please sign-in:</p>
               <StyledFirebaseAuth
